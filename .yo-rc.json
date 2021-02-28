@@ -1,0 +1,37 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "io.github.leassets"
+    },
+    "jhipsterVersion": "6.10.5",
+    "applicationType": "monolith",
+    "baseName": "leassetsServer",
+    "packageName": "io.github.leassets",
+    "packageFolder": "io/github/leassets",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "hazelcast",
+    "enableHibernateCache": true,
+    "websocket": "spring-websocket",
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": "elasticsearch",
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": true,
+    "jwtSecretKey": "ZjU3NjcyZjE3ODM4YmFmMzJhM2NlOTMwYjM3NzM1MzJhMjdiNTQyMjE4ZTZkZTMzMmJiZDUwZjBmYTNhOGY2NTYwMDliM2I5MjUzZGY0NmUzMmM4Y2NjNjZiMjJlOWFjM2ZkMWNhMzA4MzFjYjdiNWNmNzBmZjhiODBlODcxZGQ=",
+    "embeddableLaunchScript": false,
+    "creationTimestamp": 1614499334810,
+    "testFrameworks": ["gatling", "cucumber"],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "clientPackageManager": "npm",
+    "blueprints": [],
+    "skipClient": true
+  }
+}
