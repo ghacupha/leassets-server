@@ -7,11 +7,15 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
@@ -30,8 +34,21 @@ public class CacheConfiguration {
 
     private final Environment env;
 
-    public CacheConfiguration(Environment env) {
+    private final ServerProperties serverProperties;
+
+    private final DiscoveryClient discoveryClient;
+
+    private Registration registration;
+
+    public CacheConfiguration(Environment env, ServerProperties serverProperties, DiscoveryClient discoveryClient) {
         this.env = env;
+        this.serverProperties = serverProperties;
+        this.discoveryClient = discoveryClient;
+    }
+
+    @Autowired(required = false)
+    public void setRegistration(Registration registration) {
+        this.registration = registration;
     }
 
     @PreDestroy
@@ -56,16 +73,36 @@ public class CacheConfiguration {
         }
         Config config = new Config();
         config.setInstanceName("leassetsServer");
-        config.getNetworkConfig().setPort(5701);
-        config.getNetworkConfig().setPortAutoIncrement(true);
+        config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
+        if (this.registration == null) {
+            log.warn("No discovery service is set up, Hazelcast cannot create a cluster.");
+        } else {
+            // The serviceId is by default the application's name,
+            // see the "spring.application.name" standard Spring property
+            String serviceId = registration.getServiceId();
+            log.debug("Configuring Hazelcast clustering for instanceId: {}", serviceId);
+            // In development, everything goes through 127.0.0.1, with a different port
+            if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
+                log.debug(
+                    "Application is running with the \"dev\" profile, Hazelcast " + "cluster will only work with localhost instances"
+                );
 
-        // In development, remove multicast auto-configuration
-        if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
-            System.setProperty("hazelcast.local.localAddress", "127.0.0.1");
-
-            config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
-            config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
-            config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
+                config.getNetworkConfig().setPort(serverProperties.getPort() + 5701);
+                config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
+                for (ServiceInstance instance : discoveryClient.getInstances(serviceId)) {
+                    String clusterMember = "127.0.0.1:" + (instance.getPort() + 5701);
+                    log.debug("Adding Hazelcast (dev) cluster member {}", clusterMember);
+                    config.getNetworkConfig().getJoin().getTcpIpConfig().addMember(clusterMember);
+                }
+            } else { // Production configuration, one host per instance all using port 5701
+                config.getNetworkConfig().setPort(5701);
+                config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
+                for (ServiceInstance instance : discoveryClient.getInstances(serviceId)) {
+                    String clusterMember = instance.getHost() + ":5701";
+                    log.debug("Adding Hazelcast (prod) cluster member {}", clusterMember);
+                    config.getNetworkConfig().getJoin().getTcpIpConfig().addMember(clusterMember);
+                }
+            }
         }
         config.setManagementCenterConfig(new ManagementCenterConfig());
         config.addMapConfig(initializeDefaultMapConfig(jHipsterProperties));
