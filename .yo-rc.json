@@ -45,6 +45,7 @@
     "reactive": false,
     "nativeLanguage": "en",
     "languages": ["en", "fr"],
-    "entities": []
+    "entities": ["FixedAssetAcquisition"],
+    "lastLiquibaseTimestamp": 1616499421000
   }
 }
