@@ -1,7 +1,7 @@
 package io.github.leassets.web.rest;
 
 /*-
- * Leassets Server - ${project.description}
+ * Leassets Server - Leases and assets management platform
  * Copyright © 2021 Edwin Njeru (mailnjeru@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,6 @@ package io.github.leassets.web.rest;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.leassets.security.jwt.JWTFilter;
 import io.github.leassets.security.jwt.TokenProvider;
