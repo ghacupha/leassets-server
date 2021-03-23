@@ -45,7 +45,7 @@
     "reactive": false,
     "nativeLanguage": "en",
     "languages": ["en", "fr"],
-    "entities": ["FixedAssetAcquisition", "FixedAssetNetBookValue"],
+    "entities": ["FixedAssetAcquisition", "FixedAssetNetBookValue", "FixedAssetDepreciation"],
     "lastLiquibaseTimestamp": 1616499421000
   }
 }
