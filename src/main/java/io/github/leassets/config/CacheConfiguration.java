@@ -1,33 +1,28 @@
 package io.github.leassets.config;
 
-import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.JHipsterProperties;
-
 import com.hazelcast.config.*;
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Hazelcast;
-
+import com.hazelcast.core.HazelcastInstance;
+import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
-import org.springframework.cache.CacheManager;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
-import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
-import io.github.jhipster.config.cache.PrefixedKeyGenerator;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
-
-import javax.annotation.PreDestroy;
+import tech.jhipster.config.JHipsterConstants;
+import tech.jhipster.config.JHipsterProperties;
+import tech.jhipster.config.cache.PrefixedKeyGenerator;
 
 @Configuration
 @EnableCaching
 public class CacheConfiguration {
+
     private GitProperties gitProperties;
     private BuildProperties buildProperties;
 
@@ -72,24 +67,14 @@ public class CacheConfiguration {
             config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
             config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
         }
-        config.getMapConfigs().put("default", initializeDefaultMapConfig(jHipsterProperties));
-
-        // Full reference is available at: https://docs.hazelcast.org/docs/management-center/3.9/manual/html/Deploying_and_Starting.html
-        config.setManagementCenterConfig(initializeDefaultManagementCenterConfig(jHipsterProperties));
-        config.getMapConfigs().put("io.github.leassets.domain.*", initializeDomainMapConfig(jHipsterProperties));
+        config.setManagementCenterConfig(new ManagementCenterConfig());
+        config.addMapConfig(initializeDefaultMapConfig(jHipsterProperties));
+        config.addMapConfig(initializeDomainMapConfig(jHipsterProperties));
         return Hazelcast.newHazelcastInstance(config);
     }
 
-    private ManagementCenterConfig initializeDefaultManagementCenterConfig(JHipsterProperties jHipsterProperties) {
-        ManagementCenterConfig managementCenterConfig = new ManagementCenterConfig();
-        managementCenterConfig.setEnabled(jHipsterProperties.getCache().getHazelcast().getManagementCenter().isEnabled());
-        managementCenterConfig.setUrl(jHipsterProperties.getCache().getHazelcast().getManagementCenter().getUrl());
-        managementCenterConfig.setUpdateInterval(jHipsterProperties.getCache().getHazelcast().getManagementCenter().getUpdateInterval());
-        return managementCenterConfig;
-    }
-
     private MapConfig initializeDefaultMapConfig(JHipsterProperties jHipsterProperties) {
-        MapConfig mapConfig = new MapConfig();
+        MapConfig mapConfig = new MapConfig("default");
 
         /*
         Number of backups. If 1 is set as the backup-count for example,
@@ -105,7 +90,7 @@ public class CacheConfiguration {
         LFU (Least Frequently Used).
         NONE is the default.
         */
-        mapConfig.setEvictionPolicy(EvictionPolicy.LRU);
+        mapConfig.getEvictionConfig().setEvictionPolicy(EvictionPolicy.LRU);
 
         /*
         Maximum size of the map. When max size is reached,
@@ -113,13 +98,13 @@ public class CacheConfiguration {
         Any integer between 0 and Integer.MAX_VALUE. 0 means
         Integer.MAX_VALUE. Default is 0.
         */
-        mapConfig.setMaxSizeConfig(new MaxSizeConfig(0, MaxSizeConfig.MaxSizePolicy.USED_HEAP_SIZE));
+        mapConfig.getEvictionConfig().setMaxSizePolicy(MaxSizePolicy.USED_HEAP_SIZE);
 
         return mapConfig;
     }
 
     private MapConfig initializeDomainMapConfig(JHipsterProperties jHipsterProperties) {
-        MapConfig mapConfig = new MapConfig();
+        MapConfig mapConfig = new MapConfig("io.github.leassets.domain.*");
         mapConfig.setTimeToLiveSeconds(jHipsterProperties.getCache().getHazelcast().getTimeToLiveSeconds());
         return mapConfig;
     }
