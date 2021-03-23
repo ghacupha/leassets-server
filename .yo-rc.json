@@ -3,7 +3,7 @@
     "promptValues": {
       "packageName": "io.github.leassets"
     },
-    "jhipsterVersion": "6.10.5",
+    "jhipsterVersion": "7.0.0",
     "applicationType": "monolith",
     "baseName": "leassetsServer",
     "packageName": "io.github.leassets",
@@ -32,6 +32,19 @@
     "enableTranslation": false,
     "clientPackageManager": "npm",
     "blueprints": [],
-    "skipClient": true
+    "skipClient": true,
+    "clientFramework": "angularX",
+    "skipUserManagement": false,
+    "withAdminUi": true,
+    "clientTheme": "none",
+    "clientThemeVariant": "",
+    "skipServer": false,
+    "skipCheckLengthOfIdentifier": false,
+    "skipFakeData": false,
+    "pages": [],
+    "reactive": false,
+    "nativeLanguage": "en",
+    "languages": ["en", "fr"],
+    "entities": []
   }
 }
