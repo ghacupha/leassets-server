@@ -1,9 +1,9 @@
 {
   "name": "leassets-server",
-  "version": "0.0.0",
+  "version": "0.0.1-SNAPSHOT",
   "private": true,
-  "description": "Description for leassetsServer",
-  "license": "UNLICENSED",
+  "description": "Server for the leassets system",
+  "license": "GPLv3",
   "scripts": {
     "prettier:check": "prettier --check \"{,src/**/}*.{md,json,yml,html,java}\"",
     "prettier:format": "prettier --write \"{,src/**/}*.{md,json,yml,html,java}\"",
