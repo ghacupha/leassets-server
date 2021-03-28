@@ -1,6 +1,6 @@
 package io.github.leassets.internal.resource.decorator;
 
-import io.github.leassets.service.dto.LeassetsFileUploadCriteria;
+import io.github.leassets.service.criteria.LeassetsFileUploadCriteria;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import io.github.leassets.web.rest.LeassetsFileUploadResource;
 import java.net.URISyntaxException;

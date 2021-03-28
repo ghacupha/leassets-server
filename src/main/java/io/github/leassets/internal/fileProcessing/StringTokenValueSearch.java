@@ -2,7 +2,7 @@ package io.github.leassets.internal.fileProcessing;
 
 import io.github.jhipster.service.filter.StringFilter;
 import io.github.leassets.service.LeassetsMessageTokenQueryService;
-import io.github.leassets.service.dto.LeassetsMessageTokenCriteria;
+import io.github.leassets.service.criteria.LeassetsMessageTokenCriteria;
 import io.github.leassets.service.dto.LeassetsMessageTokenDTO;
 import org.springframework.stereotype.Service;
 

@@ -1,15 +1,13 @@
 package io.github.leassets.service;
 
-import io.github.jhipster.service.QueryService;
 import io.github.leassets.domain.*; // for static metamodels
 import io.github.leassets.domain.LeassetsFileUpload;
 import io.github.leassets.repository.LeassetsFileUploadRepository;
 import io.github.leassets.repository.search.LeassetsFileUploadSearchRepository;
-import io.github.leassets.service.dto.LeassetsFileUploadCriteria;
+import io.github.leassets.service.criteria.LeassetsFileUploadCriteria;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import io.github.leassets.service.mapper.LeassetsFileUploadMapper;
 import java.util.List;
-import javax.persistence.criteria.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -17,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tech.jhipster.service.QueryService;
 
 /**
  * Service for executing complex queries for {@link LeassetsFileUpload} entities in the database.
