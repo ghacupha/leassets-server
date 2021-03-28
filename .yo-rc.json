@@ -47,5 +47,13 @@
     "languages": ["en", "fr"],
     "entities": ["FixedAssetAcquisition", "FixedAssetNetBookValue", "FixedAssetDepreciation"],
     "lastLiquibaseTimestamp": 1616499421000
+  },
+  "generator-jhipster-file-handling": {
+    "promptValues": {
+      "gatewayMicroserviceName": "leassets",
+      "generalClientRootFolder": "files",
+      "fileModelTypes": "FIXED_ASSET_ACQUISITION,FIXED_ASSET_DEPRECIATION,FIXED_ASSET_NBV"
+    },
+    "lastLiquibaseTimestamp": 1616939996000
   }
 }
