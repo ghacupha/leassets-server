@@ -1,4 +1,4 @@
-package io.github.leassets.internal.model;
+package io.github.leassets.internal.model.framework;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

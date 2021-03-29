@@ -5,7 +5,7 @@ import static io.github.leassets.internal.AppConstants.PROCESSED_TOKENS;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.leassets.domain.LeassetsMessageToken;
 import io.github.leassets.internal.fileProcessing.FileUploadProcessorChain;
-import io.github.leassets.internal.model.FileNotification;
+import io.github.leassets.internal.model.framework.FileNotification;
 import io.github.leassets.internal.util.TokenGenerator;
 import io.github.leassets.service.LeassetsFileUploadService;
 import io.github.leassets.service.LeassetsMessageTokenService;

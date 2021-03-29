@@ -1,6 +1,7 @@
 package io.github.leassets.internal.model;
 
 import io.github.leassets.domain.FixedAssetNetBookValue;
+import io.github.leassets.internal.model.framework.EntityRepository;
 import io.github.leassets.repository.FixedAssetNetBookValueRepository;
 
 /**

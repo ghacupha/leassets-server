@@ -1,8 +1,15 @@
-package io.github.leassets.internal.model;
+package io.github.leassets.internal.service;
 
 import io.github.leassets.domain.FixedAssetAcquisition;
 import io.github.leassets.domain.FixedAssetDepreciation;
 import io.github.leassets.domain.FixedAssetNetBookValue;
+import io.github.leassets.internal.model.FixedAssetAcquisitionEntityRepository;
+import io.github.leassets.internal.model.FixedAssetAcquisitionEntitySearchRepository;
+import io.github.leassets.internal.model.FixedAssetDepreciationEntityRepository;
+import io.github.leassets.internal.model.FixedAssetDepreciationEntitySearchRepository;
+import io.github.leassets.internal.model.FixedAssetNetBookValueEntityRepository;
+import io.github.leassets.internal.model.FixedAssetNetBookValueEntitySearchRepository;
+import io.github.leassets.internal.model.framework.DefaultBatchService;
 import io.github.leassets.internal.service.BatchService;
 import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
 import io.github.leassets.service.dto.FixedAssetDepreciationDTO;

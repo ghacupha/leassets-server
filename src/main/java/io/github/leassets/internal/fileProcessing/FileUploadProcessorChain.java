@@ -1,7 +1,7 @@
 package io.github.leassets.internal.fileProcessing;
 
 import com.google.common.collect.ImmutableList;
-import io.github.leassets.internal.model.FileNotification;
+import io.github.leassets.internal.model.framework.FileNotification;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

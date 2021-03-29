@@ -1,7 +1,7 @@
 package io.github.leassets.internal.fileProcessing;
 
 import io.github.leassets.domain.enumeration.LeassetsFileModelType;
-import io.github.leassets.internal.model.FileNotification;
+import io.github.leassets.internal.model.framework.FileNotification;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import org.slf4j.Logger;
 import org.springframework.batch.core.Job;

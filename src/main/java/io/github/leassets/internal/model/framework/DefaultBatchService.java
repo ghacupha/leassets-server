@@ -1,4 +1,4 @@
-package io.github.leassets.internal.model;
+package io.github.leassets.internal.model.framework;
 
 import io.github.leassets.internal.service.BatchService;
 import io.github.leassets.service.mapper.EntityMapper;

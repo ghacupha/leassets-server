@@ -1,6 +1,7 @@
 package io.github.leassets.internal.model;
 
 import io.github.leassets.domain.FixedAssetAcquisition;
+import io.github.leassets.internal.model.framework.EntityRepository;
 import io.github.leassets.repository.FixedAssetAcquisitionRepository;
 
 /**
