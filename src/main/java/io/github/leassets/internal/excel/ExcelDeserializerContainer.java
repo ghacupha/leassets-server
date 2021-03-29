@@ -22,7 +22,6 @@ public class ExcelDeserializerContainer {
     public ExcelFileDeserializer<CurrencyTableEVM> currencyTableExcelFileDeserializer() {
         return excelFile -> new DefaultExcelFileDeserializer<>(CurrencyTableEVM.class, getDefaultPoijiOptions()).deserialize(excelFile);
     }
-    // todo create bean for every data model
 
     @Bean("fixedAssetAcquisitionExcelFileDeserializer")
     public ExcelFileDeserializer<FixedAssetAcquisitionEVM> fixedAssetAcquisitionExcelFileDeserializer() {
