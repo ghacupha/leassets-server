@@ -7,26 +7,27 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import io.github.leassets.LeassetsServerApp;
+import io.github.leassets.IntegrationTest;
 import io.github.leassets.domain.LeassetsFileUpload;
 import io.github.leassets.repository.LeassetsFileUploadRepository;
 import io.github.leassets.repository.search.LeassetsFileUploadSearchRepository;
-import io.github.leassets.service.LeassetsFileUploadQueryService;
-import io.github.leassets.service.LeassetsFileUploadService;
+import io.github.leassets.service.criteria.LeassetsFileUploadCriteria;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import io.github.leassets.service.mapper.LeassetsFileUploadMapper;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -38,11 +39,11 @@ import org.springframework.util.Base64Utils;
 /**
  * Integration tests for the {@link LeassetsFileUploadResource} REST controller.
  */
-@SpringBootTest(classes = LeassetsServerApp.class)
+@IntegrationTest
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
-public class LeassetsFileUploadResourceIT {
+class LeassetsFileUploadResourceIT {
 
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
@@ -76,14 +77,18 @@ public class LeassetsFileUploadResourceIT {
     private static final String DEFAULT_UPLOAD_TOKEN = "AAAAAAAAAA";
     private static final String UPDATED_UPLOAD_TOKEN = "BBBBBBBBBB";
 
+    private static final String ENTITY_API_URL = "/api/leassets-file-uploads";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+    private static final String ENTITY_SEARCH_API_URL = "/api/_search/leassets-file-uploads";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
     @Autowired
     private LeassetsFileUploadRepository leassetsFileUploadRepository;
 
     @Autowired
     private LeassetsFileUploadMapper leassetsFileUploadMapper;
-
-    @Autowired
-    private LeassetsFileUploadService leassetsFileUploadService;
 
     /**
      * This repository is mocked in the io.github.leassets.repository.search test package.
@@ -92,9 +97,6 @@ public class LeassetsFileUploadResourceIT {
      */
     @Autowired
     private LeassetsFileUploadSearchRepository mockLeassetsFileUploadSearchRepository;
-
-    @Autowired
-    private LeassetsFileUploadQueryService leassetsFileUploadQueryService;
 
     @Autowired
     private EntityManager em;
@@ -153,13 +155,13 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void createLeassetsFileUpload() throws Exception {
+    void createLeassetsFileUpload() throws Exception {
         int databaseSizeBeforeCreate = leassetsFileUploadRepository.findAll().size();
         // Create the LeassetsFileUpload
         LeassetsFileUploadDTO leassetsFileUploadDTO = leassetsFileUploadMapper.toDto(leassetsFileUpload);
         restLeassetsFileUploadMockMvc
             .perform(
-                post("/api/leassets-file-uploads")
+                post(ENTITY_API_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
             )
@@ -176,8 +178,8 @@ public class LeassetsFileUploadResourceIT {
         assertThat(testLeassetsFileUpload.getLeassetsFileTypeId()).isEqualTo(DEFAULT_LEASSETS_FILE_TYPE_ID);
         assertThat(testLeassetsFileUpload.getDataFile()).isEqualTo(DEFAULT_DATA_FILE);
         assertThat(testLeassetsFileUpload.getDataFileContentType()).isEqualTo(DEFAULT_DATA_FILE_CONTENT_TYPE);
-        assertThat(testLeassetsFileUpload.isUploadSuccessful()).isEqualTo(DEFAULT_UPLOAD_SUCCESSFUL);
-        assertThat(testLeassetsFileUpload.isUploadProcessed()).isEqualTo(DEFAULT_UPLOAD_PROCESSED);
+        assertThat(testLeassetsFileUpload.getUploadSuccessful()).isEqualTo(DEFAULT_UPLOAD_SUCCESSFUL);
+        assertThat(testLeassetsFileUpload.getUploadProcessed()).isEqualTo(DEFAULT_UPLOAD_PROCESSED);
         assertThat(testLeassetsFileUpload.getUploadToken()).isEqualTo(DEFAULT_UPLOAD_TOKEN);
 
         // Validate the LeassetsFileUpload in Elasticsearch
@@ -186,17 +188,17 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void createLeassetsFileUploadWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = leassetsFileUploadRepository.findAll().size();
-
+    void createLeassetsFileUploadWithExistingId() throws Exception {
         // Create the LeassetsFileUpload with an existing ID
         leassetsFileUpload.setId(1L);
         LeassetsFileUploadDTO leassetsFileUploadDTO = leassetsFileUploadMapper.toDto(leassetsFileUpload);
 
+        int databaseSizeBeforeCreate = leassetsFileUploadRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restLeassetsFileUploadMockMvc
             .perform(
-                post("/api/leassets-file-uploads")
+                post(ENTITY_API_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
             )
@@ -212,7 +214,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void checkDescriptionIsRequired() throws Exception {
+    void checkDescriptionIsRequired() throws Exception {
         int databaseSizeBeforeTest = leassetsFileUploadRepository.findAll().size();
         // set the field null
         leassetsFileUpload.setDescription(null);
@@ -222,7 +224,7 @@ public class LeassetsFileUploadResourceIT {
 
         restLeassetsFileUploadMockMvc
             .perform(
-                post("/api/leassets-file-uploads")
+                post(ENTITY_API_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
             )
@@ -234,7 +236,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void checkFileNameIsRequired() throws Exception {
+    void checkFileNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = leassetsFileUploadRepository.findAll().size();
         // set the field null
         leassetsFileUpload.setFileName(null);
@@ -244,7 +246,7 @@ public class LeassetsFileUploadResourceIT {
 
         restLeassetsFileUploadMockMvc
             .perform(
-                post("/api/leassets-file-uploads")
+                post(ENTITY_API_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
             )
@@ -256,7 +258,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void checkLeassetsFileTypeIdIsRequired() throws Exception {
+    void checkLeassetsFileTypeIdIsRequired() throws Exception {
         int databaseSizeBeforeTest = leassetsFileUploadRepository.findAll().size();
         // set the field null
         leassetsFileUpload.setLeassetsFileTypeId(null);
@@ -266,7 +268,7 @@ public class LeassetsFileUploadResourceIT {
 
         restLeassetsFileUploadMockMvc
             .perform(
-                post("/api/leassets-file-uploads")
+                post(ENTITY_API_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
             )
@@ -278,13 +280,13 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploads() throws Exception {
+    void getAllLeassetsFileUploads() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
         // Get all the leassetsFileUploadList
         restLeassetsFileUploadMockMvc
-            .perform(get("/api/leassets-file-uploads?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leassetsFileUpload.getId().intValue())))
@@ -302,13 +304,13 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getLeassetsFileUpload() throws Exception {
+    void getLeassetsFileUpload() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
         // Get the leassetsFileUpload
         restLeassetsFileUploadMockMvc
-            .perform(get("/api/leassets-file-uploads/{id}", leassetsFileUpload.getId()))
+            .perform(get(ENTITY_API_URL_ID, leassetsFileUpload.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(leassetsFileUpload.getId().intValue()))
@@ -326,7 +328,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getLeassetsFileUploadsByIdFiltering() throws Exception {
+    void getLeassetsFileUploadsByIdFiltering() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -344,7 +346,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByDescriptionIsEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -357,7 +359,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByDescriptionIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByDescriptionIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -370,7 +372,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByDescriptionIsInShouldWork() throws Exception {
+    void getAllLeassetsFileUploadsByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -383,7 +385,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByDescriptionIsNullOrNotNull() throws Exception {
+    void getAllLeassetsFileUploadsByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -396,7 +398,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByDescriptionContainsSomething() throws Exception {
+    void getAllLeassetsFileUploadsByDescriptionContainsSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -409,7 +411,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByDescriptionNotContainsSomething() throws Exception {
+    void getAllLeassetsFileUploadsByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -422,7 +424,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByFileNameIsEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByFileNameIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -435,7 +437,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByFileNameIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByFileNameIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -448,7 +450,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByFileNameIsInShouldWork() throws Exception {
+    void getAllLeassetsFileUploadsByFileNameIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -461,7 +463,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByFileNameIsNullOrNotNull() throws Exception {
+    void getAllLeassetsFileUploadsByFileNameIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -474,7 +476,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByFileNameContainsSomething() throws Exception {
+    void getAllLeassetsFileUploadsByFileNameContainsSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -487,7 +489,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByFileNameNotContainsSomething() throws Exception {
+    void getAllLeassetsFileUploadsByFileNameNotContainsSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -500,7 +502,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodFromIsEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodFromIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -513,7 +515,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodFromIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodFromIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -526,7 +528,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodFromIsInShouldWork() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodFromIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -539,7 +541,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodFromIsNullOrNotNull() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodFromIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -552,7 +554,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodFromIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodFromIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -565,7 +567,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodFromIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodFromIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -578,7 +580,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodFromIsLessThanSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodFromIsLessThanSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -591,7 +593,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodFromIsGreaterThanSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodFromIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -604,7 +606,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodToIsEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodToIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -617,7 +619,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodToIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodToIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -630,7 +632,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodToIsInShouldWork() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodToIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -643,7 +645,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodToIsNullOrNotNull() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodToIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -656,7 +658,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodToIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodToIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -669,7 +671,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodToIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodToIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -682,7 +684,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodToIsLessThanSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodToIsLessThanSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -695,7 +697,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByPeriodToIsGreaterThanSomething() throws Exception {
+    void getAllLeassetsFileUploadsByPeriodToIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -708,7 +710,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -721,7 +723,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -734,7 +736,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsInShouldWork() throws Exception {
+    void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -749,7 +751,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsNullOrNotNull() throws Exception {
+    void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -762,7 +764,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -775,7 +777,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -788,7 +790,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsLessThanSomething() throws Exception {
+    void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsLessThanSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -801,7 +803,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsGreaterThanSomething() throws Exception {
+    void getAllLeassetsFileUploadsByLeassetsFileTypeIdIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -814,7 +816,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadSuccessfulIsEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByUploadSuccessfulIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -827,7 +829,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadSuccessfulIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByUploadSuccessfulIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -840,7 +842,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadSuccessfulIsInShouldWork() throws Exception {
+    void getAllLeassetsFileUploadsByUploadSuccessfulIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -853,7 +855,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadSuccessfulIsNullOrNotNull() throws Exception {
+    void getAllLeassetsFileUploadsByUploadSuccessfulIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -866,7 +868,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadProcessedIsEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByUploadProcessedIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -879,7 +881,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadProcessedIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByUploadProcessedIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -892,7 +894,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadProcessedIsInShouldWork() throws Exception {
+    void getAllLeassetsFileUploadsByUploadProcessedIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -905,7 +907,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadProcessedIsNullOrNotNull() throws Exception {
+    void getAllLeassetsFileUploadsByUploadProcessedIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -918,7 +920,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadTokenIsEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByUploadTokenIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -931,7 +933,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadTokenIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsFileUploadsByUploadTokenIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -944,7 +946,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadTokenIsInShouldWork() throws Exception {
+    void getAllLeassetsFileUploadsByUploadTokenIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -957,7 +959,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadTokenIsNullOrNotNull() throws Exception {
+    void getAllLeassetsFileUploadsByUploadTokenIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -970,7 +972,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadTokenContainsSomething() throws Exception {
+    void getAllLeassetsFileUploadsByUploadTokenContainsSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -983,7 +985,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsFileUploadsByUploadTokenNotContainsSomething() throws Exception {
+    void getAllLeassetsFileUploadsByUploadTokenNotContainsSomething() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -999,7 +1001,7 @@ public class LeassetsFileUploadResourceIT {
      */
     private void defaultLeassetsFileUploadShouldBeFound(String filter) throws Exception {
         restLeassetsFileUploadMockMvc
-            .perform(get("/api/leassets-file-uploads?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leassetsFileUpload.getId().intValue())))
@@ -1016,7 +1018,7 @@ public class LeassetsFileUploadResourceIT {
 
         // Check, that the count call also returns 1
         restLeassetsFileUploadMockMvc
-            .perform(get("/api/leassets-file-uploads/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -1027,7 +1029,7 @@ public class LeassetsFileUploadResourceIT {
      */
     private void defaultLeassetsFileUploadShouldNotBeFound(String filter) throws Exception {
         restLeassetsFileUploadMockMvc
-            .perform(get("/api/leassets-file-uploads?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -1035,7 +1037,7 @@ public class LeassetsFileUploadResourceIT {
 
         // Check, that the count call also returns 0
         restLeassetsFileUploadMockMvc
-            .perform(get("/api/leassets-file-uploads/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -1043,14 +1045,14 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingLeassetsFileUpload() throws Exception {
+    void getNonExistingLeassetsFileUpload() throws Exception {
         // Get the leassetsFileUpload
-        restLeassetsFileUploadMockMvc.perform(get("/api/leassets-file-uploads/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restLeassetsFileUploadMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateLeassetsFileUpload() throws Exception {
+    void putNewLeassetsFileUpload() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -1075,7 +1077,7 @@ public class LeassetsFileUploadResourceIT {
 
         restLeassetsFileUploadMockMvc
             .perform(
-                put("/api/leassets-file-uploads")
+                put(ENTITY_API_URL_ID, leassetsFileUploadDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
             )
@@ -1092,18 +1094,19 @@ public class LeassetsFileUploadResourceIT {
         assertThat(testLeassetsFileUpload.getLeassetsFileTypeId()).isEqualTo(UPDATED_LEASSETS_FILE_TYPE_ID);
         assertThat(testLeassetsFileUpload.getDataFile()).isEqualTo(UPDATED_DATA_FILE);
         assertThat(testLeassetsFileUpload.getDataFileContentType()).isEqualTo(UPDATED_DATA_FILE_CONTENT_TYPE);
-        assertThat(testLeassetsFileUpload.isUploadSuccessful()).isEqualTo(UPDATED_UPLOAD_SUCCESSFUL);
-        assertThat(testLeassetsFileUpload.isUploadProcessed()).isEqualTo(UPDATED_UPLOAD_PROCESSED);
+        assertThat(testLeassetsFileUpload.getUploadSuccessful()).isEqualTo(UPDATED_UPLOAD_SUCCESSFUL);
+        assertThat(testLeassetsFileUpload.getUploadProcessed()).isEqualTo(UPDATED_UPLOAD_PROCESSED);
         assertThat(testLeassetsFileUpload.getUploadToken()).isEqualTo(UPDATED_UPLOAD_TOKEN);
 
         // Validate the LeassetsFileUpload in Elasticsearch
-        verify(mockLeassetsFileUploadSearchRepository, times(1)).save(testLeassetsFileUpload);
+        verify(mockLeassetsFileUploadSearchRepository).save(testLeassetsFileUpload);
     }
 
     @Test
     @Transactional
-    public void updateNonExistingLeassetsFileUpload() throws Exception {
+    void putNonExistingLeassetsFileUpload() throws Exception {
         int databaseSizeBeforeUpdate = leassetsFileUploadRepository.findAll().size();
+        leassetsFileUpload.setId(count.incrementAndGet());
 
         // Create the LeassetsFileUpload
         LeassetsFileUploadDTO leassetsFileUploadDTO = leassetsFileUploadMapper.toDto(leassetsFileUpload);
@@ -1111,7 +1114,7 @@ public class LeassetsFileUploadResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restLeassetsFileUploadMockMvc
             .perform(
-                put("/api/leassets-file-uploads")
+                put(ENTITY_API_URL_ID, leassetsFileUploadDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
             )
@@ -1127,7 +1130,228 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void deleteLeassetsFileUpload() throws Exception {
+    void putWithIdMismatchLeassetsFileUpload() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsFileUploadRepository.findAll().size();
+        leassetsFileUpload.setId(count.incrementAndGet());
+
+        // Create the LeassetsFileUpload
+        LeassetsFileUploadDTO leassetsFileUploadDTO = leassetsFileUploadMapper.toDto(leassetsFileUpload);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeassetsFileUploadMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeassetsFileUpload in the database
+        List<LeassetsFileUpload> leassetsFileUploadList = leassetsFileUploadRepository.findAll();
+        assertThat(leassetsFileUploadList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsFileUpload in Elasticsearch
+        verify(mockLeassetsFileUploadSearchRepository, times(0)).save(leassetsFileUpload);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamLeassetsFileUpload() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsFileUploadRepository.findAll().size();
+        leassetsFileUpload.setId(count.incrementAndGet());
+
+        // Create the LeassetsFileUpload
+        LeassetsFileUploadDTO leassetsFileUploadDTO = leassetsFileUploadMapper.toDto(leassetsFileUpload);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeassetsFileUploadMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeassetsFileUpload in the database
+        List<LeassetsFileUpload> leassetsFileUploadList = leassetsFileUploadRepository.findAll();
+        assertThat(leassetsFileUploadList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsFileUpload in Elasticsearch
+        verify(mockLeassetsFileUploadSearchRepository, times(0)).save(leassetsFileUpload);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateLeassetsFileUploadWithPatch() throws Exception {
+        // Initialize the database
+        leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
+
+        int databaseSizeBeforeUpdate = leassetsFileUploadRepository.findAll().size();
+
+        // Update the leassetsFileUpload using partial update
+        LeassetsFileUpload partialUpdatedLeassetsFileUpload = new LeassetsFileUpload();
+        partialUpdatedLeassetsFileUpload.setId(leassetsFileUpload.getId());
+
+        partialUpdatedLeassetsFileUpload
+            .description(UPDATED_DESCRIPTION)
+            .fileName(UPDATED_FILE_NAME)
+            .periodTo(UPDATED_PERIOD_TO)
+            .leassetsFileTypeId(UPDATED_LEASSETS_FILE_TYPE_ID)
+            .uploadProcessed(UPDATED_UPLOAD_PROCESSED);
+
+        restLeassetsFileUploadMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeassetsFileUpload.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeassetsFileUpload))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeassetsFileUpload in the database
+        List<LeassetsFileUpload> leassetsFileUploadList = leassetsFileUploadRepository.findAll();
+        assertThat(leassetsFileUploadList).hasSize(databaseSizeBeforeUpdate);
+        LeassetsFileUpload testLeassetsFileUpload = leassetsFileUploadList.get(leassetsFileUploadList.size() - 1);
+        assertThat(testLeassetsFileUpload.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testLeassetsFileUpload.getFileName()).isEqualTo(UPDATED_FILE_NAME);
+        assertThat(testLeassetsFileUpload.getPeriodFrom()).isEqualTo(DEFAULT_PERIOD_FROM);
+        assertThat(testLeassetsFileUpload.getPeriodTo()).isEqualTo(UPDATED_PERIOD_TO);
+        assertThat(testLeassetsFileUpload.getLeassetsFileTypeId()).isEqualTo(UPDATED_LEASSETS_FILE_TYPE_ID);
+        assertThat(testLeassetsFileUpload.getDataFile()).isEqualTo(DEFAULT_DATA_FILE);
+        assertThat(testLeassetsFileUpload.getDataFileContentType()).isEqualTo(DEFAULT_DATA_FILE_CONTENT_TYPE);
+        assertThat(testLeassetsFileUpload.getUploadSuccessful()).isEqualTo(DEFAULT_UPLOAD_SUCCESSFUL);
+        assertThat(testLeassetsFileUpload.getUploadProcessed()).isEqualTo(UPDATED_UPLOAD_PROCESSED);
+        assertThat(testLeassetsFileUpload.getUploadToken()).isEqualTo(DEFAULT_UPLOAD_TOKEN);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateLeassetsFileUploadWithPatch() throws Exception {
+        // Initialize the database
+        leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
+
+        int databaseSizeBeforeUpdate = leassetsFileUploadRepository.findAll().size();
+
+        // Update the leassetsFileUpload using partial update
+        LeassetsFileUpload partialUpdatedLeassetsFileUpload = new LeassetsFileUpload();
+        partialUpdatedLeassetsFileUpload.setId(leassetsFileUpload.getId());
+
+        partialUpdatedLeassetsFileUpload
+            .description(UPDATED_DESCRIPTION)
+            .fileName(UPDATED_FILE_NAME)
+            .periodFrom(UPDATED_PERIOD_FROM)
+            .periodTo(UPDATED_PERIOD_TO)
+            .leassetsFileTypeId(UPDATED_LEASSETS_FILE_TYPE_ID)
+            .dataFile(UPDATED_DATA_FILE)
+            .dataFileContentType(UPDATED_DATA_FILE_CONTENT_TYPE)
+            .uploadSuccessful(UPDATED_UPLOAD_SUCCESSFUL)
+            .uploadProcessed(UPDATED_UPLOAD_PROCESSED)
+            .uploadToken(UPDATED_UPLOAD_TOKEN);
+
+        restLeassetsFileUploadMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeassetsFileUpload.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeassetsFileUpload))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeassetsFileUpload in the database
+        List<LeassetsFileUpload> leassetsFileUploadList = leassetsFileUploadRepository.findAll();
+        assertThat(leassetsFileUploadList).hasSize(databaseSizeBeforeUpdate);
+        LeassetsFileUpload testLeassetsFileUpload = leassetsFileUploadList.get(leassetsFileUploadList.size() - 1);
+        assertThat(testLeassetsFileUpload.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testLeassetsFileUpload.getFileName()).isEqualTo(UPDATED_FILE_NAME);
+        assertThat(testLeassetsFileUpload.getPeriodFrom()).isEqualTo(UPDATED_PERIOD_FROM);
+        assertThat(testLeassetsFileUpload.getPeriodTo()).isEqualTo(UPDATED_PERIOD_TO);
+        assertThat(testLeassetsFileUpload.getLeassetsFileTypeId()).isEqualTo(UPDATED_LEASSETS_FILE_TYPE_ID);
+        assertThat(testLeassetsFileUpload.getDataFile()).isEqualTo(UPDATED_DATA_FILE);
+        assertThat(testLeassetsFileUpload.getDataFileContentType()).isEqualTo(UPDATED_DATA_FILE_CONTENT_TYPE);
+        assertThat(testLeassetsFileUpload.getUploadSuccessful()).isEqualTo(UPDATED_UPLOAD_SUCCESSFUL);
+        assertThat(testLeassetsFileUpload.getUploadProcessed()).isEqualTo(UPDATED_UPLOAD_PROCESSED);
+        assertThat(testLeassetsFileUpload.getUploadToken()).isEqualTo(UPDATED_UPLOAD_TOKEN);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingLeassetsFileUpload() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsFileUploadRepository.findAll().size();
+        leassetsFileUpload.setId(count.incrementAndGet());
+
+        // Create the LeassetsFileUpload
+        LeassetsFileUploadDTO leassetsFileUploadDTO = leassetsFileUploadMapper.toDto(leassetsFileUpload);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restLeassetsFileUploadMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, leassetsFileUploadDTO.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeassetsFileUpload in the database
+        List<LeassetsFileUpload> leassetsFileUploadList = leassetsFileUploadRepository.findAll();
+        assertThat(leassetsFileUploadList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsFileUpload in Elasticsearch
+        verify(mockLeassetsFileUploadSearchRepository, times(0)).save(leassetsFileUpload);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchLeassetsFileUpload() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsFileUploadRepository.findAll().size();
+        leassetsFileUpload.setId(count.incrementAndGet());
+
+        // Create the LeassetsFileUpload
+        LeassetsFileUploadDTO leassetsFileUploadDTO = leassetsFileUploadMapper.toDto(leassetsFileUpload);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeassetsFileUploadMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeassetsFileUpload in the database
+        List<LeassetsFileUpload> leassetsFileUploadList = leassetsFileUploadRepository.findAll();
+        assertThat(leassetsFileUploadList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsFileUpload in Elasticsearch
+        verify(mockLeassetsFileUploadSearchRepository, times(0)).save(leassetsFileUpload);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamLeassetsFileUpload() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsFileUploadRepository.findAll().size();
+        leassetsFileUpload.setId(count.incrementAndGet());
+
+        // Create the LeassetsFileUpload
+        LeassetsFileUploadDTO leassetsFileUploadDTO = leassetsFileUploadMapper.toDto(leassetsFileUpload);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeassetsFileUploadMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsFileUploadDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeassetsFileUpload in the database
+        List<LeassetsFileUpload> leassetsFileUploadList = leassetsFileUploadRepository.findAll();
+        assertThat(leassetsFileUploadList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsFileUpload in Elasticsearch
+        verify(mockLeassetsFileUploadSearchRepository, times(0)).save(leassetsFileUpload);
+    }
+
+    @Test
+    @Transactional
+    void deleteLeassetsFileUpload() throws Exception {
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
 
@@ -1135,7 +1359,7 @@ public class LeassetsFileUploadResourceIT {
 
         // Delete the leassetsFileUpload
         restLeassetsFileUploadMockMvc
-            .perform(delete("/api/leassets-file-uploads/{id}", leassetsFileUpload.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, leassetsFileUpload.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
@@ -1148,7 +1372,7 @@ public class LeassetsFileUploadResourceIT {
 
     @Test
     @Transactional
-    public void searchLeassetsFileUpload() throws Exception {
+    void searchLeassetsFileUpload() throws Exception {
         // Configure the mock search repository
         // Initialize the database
         leassetsFileUploadRepository.saveAndFlush(leassetsFileUpload);
@@ -1157,7 +1381,7 @@ public class LeassetsFileUploadResourceIT {
 
         // Search the leassetsFileUpload
         restLeassetsFileUploadMockMvc
-            .perform(get("/api/_search/leassets-file-uploads?query=id:" + leassetsFileUpload.getId()))
+            .perform(get(ENTITY_SEARCH_API_URL + "?query=id:" + leassetsFileUpload.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leassetsFileUpload.getId().intValue())))

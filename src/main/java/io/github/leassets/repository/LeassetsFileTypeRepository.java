@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data  repository for the LeassetsFileType entity.
+ * Spring Data SQL repository for the LeassetsFileType entity.
  */
 @SuppressWarnings("unused")
 @Repository

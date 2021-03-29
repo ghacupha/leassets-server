@@ -1,5 +1,8 @@
 package io.github.leassets.web.rest;
 
+import static org.elasticsearch.index.query.QueryBuilders.*;
+
+import io.github.leassets.repository.LeassetsMessageTokenRepository;
 import io.github.leassets.service.LeassetsMessageTokenQueryService;
 import io.github.leassets.service.LeassetsMessageTokenService;
 import io.github.leassets.service.criteria.LeassetsMessageTokenCriteria;
@@ -8,14 +11,18 @@ import io.github.leassets.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -39,13 +46,17 @@ public class LeassetsMessageTokenResource {
 
     private final LeassetsMessageTokenService leassetsMessageTokenService;
 
+    private final LeassetsMessageTokenRepository leassetsMessageTokenRepository;
+
     private final LeassetsMessageTokenQueryService leassetsMessageTokenQueryService;
 
     public LeassetsMessageTokenResource(
         LeassetsMessageTokenService leassetsMessageTokenService,
+        LeassetsMessageTokenRepository leassetsMessageTokenRepository,
         LeassetsMessageTokenQueryService leassetsMessageTokenQueryService
     ) {
         this.leassetsMessageTokenService = leassetsMessageTokenService;
+        this.leassetsMessageTokenRepository = leassetsMessageTokenRepository;
         this.leassetsMessageTokenQueryService = leassetsMessageTokenQueryService;
     }
 
@@ -72,27 +83,73 @@ public class LeassetsMessageTokenResource {
     }
 
     /**
-     * {@code PUT  /leassets-message-tokens} : Updates an existing leassetsMessageToken.
+     * {@code PUT  /leassets-message-tokens/:id} : Updates an existing leassetsMessageToken.
      *
+     * @param id the id of the leassetsMessageTokenDTO to save.
      * @param leassetsMessageTokenDTO the leassetsMessageTokenDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated leassetsMessageTokenDTO,
      * or with status {@code 400 (Bad Request)} if the leassetsMessageTokenDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the leassetsMessageTokenDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/leassets-message-tokens")
+    @PutMapping("/leassets-message-tokens/{id}")
     public ResponseEntity<LeassetsMessageTokenDTO> updateLeassetsMessageToken(
+        @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody LeassetsMessageTokenDTO leassetsMessageTokenDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update LeassetsMessageToken : {}", leassetsMessageTokenDTO);
+        log.debug("REST request to update LeassetsMessageToken : {}, {}", id, leassetsMessageTokenDTO);
         if (leassetsMessageTokenDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        if (!Objects.equals(id, leassetsMessageTokenDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!leassetsMessageTokenRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
         LeassetsMessageTokenDTO result = leassetsMessageTokenService.save(leassetsMessageTokenDTO);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, leassetsMessageTokenDTO.getId().toString()))
             .body(result);
+    }
+
+    /**
+     * {@code PATCH  /leassets-message-tokens/:id} : Partial updates given fields of an existing leassetsMessageToken, field will ignore if it is null
+     *
+     * @param id the id of the leassetsMessageTokenDTO to save.
+     * @param leassetsMessageTokenDTO the leassetsMessageTokenDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated leassetsMessageTokenDTO,
+     * or with status {@code 400 (Bad Request)} if the leassetsMessageTokenDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the leassetsMessageTokenDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the leassetsMessageTokenDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/leassets-message-tokens/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<LeassetsMessageTokenDTO> partialUpdateLeassetsMessageToken(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody LeassetsMessageTokenDTO leassetsMessageTokenDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update LeassetsMessageToken partially : {}, {}", id, leassetsMessageTokenDTO);
+        if (leassetsMessageTokenDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, leassetsMessageTokenDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!leassetsMessageTokenRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<LeassetsMessageTokenDTO> result = leassetsMessageTokenService.partialUpdate(leassetsMessageTokenDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, leassetsMessageTokenDTO.getId().toString())
+        );
     }
 
     /**

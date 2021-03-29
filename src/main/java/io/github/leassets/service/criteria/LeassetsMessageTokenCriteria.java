@@ -59,11 +59,25 @@ public class LeassetsMessageTokenCriteria implements Serializable, Criteria {
         return id;
     }
 
+    public LongFilter id() {
+        if (id == null) {
+            id = new LongFilter();
+        }
+        return id;
+    }
+
     public void setId(LongFilter id) {
         this.id = id;
     }
 
     public StringFilter getDescription() {
+        return description;
+    }
+
+    public StringFilter description() {
+        if (description == null) {
+            description = new StringFilter();
+        }
         return description;
     }
 
@@ -75,11 +89,25 @@ public class LeassetsMessageTokenCriteria implements Serializable, Criteria {
         return timeSent;
     }
 
+    public LongFilter timeSent() {
+        if (timeSent == null) {
+            timeSent = new LongFilter();
+        }
+        return timeSent;
+    }
+
     public void setTimeSent(LongFilter timeSent) {
         this.timeSent = timeSent;
     }
 
     public StringFilter getTokenValue() {
+        return tokenValue;
+    }
+
+    public StringFilter tokenValue() {
+        if (tokenValue == null) {
+            tokenValue = new StringFilter();
+        }
         return tokenValue;
     }
 
@@ -91,6 +119,13 @@ public class LeassetsMessageTokenCriteria implements Serializable, Criteria {
         return received;
     }
 
+    public BooleanFilter received() {
+        if (received == null) {
+            received = new BooleanFilter();
+        }
+        return received;
+    }
+
     public void setReceived(BooleanFilter received) {
         this.received = received;
     }
@@ -99,11 +134,25 @@ public class LeassetsMessageTokenCriteria implements Serializable, Criteria {
         return actioned;
     }
 
+    public BooleanFilter actioned() {
+        if (actioned == null) {
+            actioned = new BooleanFilter();
+        }
+        return actioned;
+    }
+
     public void setActioned(BooleanFilter actioned) {
         this.actioned = actioned;
     }
 
     public BooleanFilter getContentFullyEnqueued() {
+        return contentFullyEnqueued;
+    }
+
+    public BooleanFilter contentFullyEnqueued() {
+        if (contentFullyEnqueued == null) {
+            contentFullyEnqueued = new BooleanFilter();
+        }
         return contentFullyEnqueued;
     }
 
@@ -140,13 +189,13 @@ public class LeassetsMessageTokenCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "LeassetsMessageTokenCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (description != null ? "description=" + description + ", " : "") +
-                (timeSent != null ? "timeSent=" + timeSent + ", " : "") +
-                (tokenValue != null ? "tokenValue=" + tokenValue + ", " : "") +
-                (received != null ? "received=" + received + ", " : "") +
-                (actioned != null ? "actioned=" + actioned + ", " : "") +
-                (contentFullyEnqueued != null ? "contentFullyEnqueued=" + contentFullyEnqueued + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (description != null ? "description=" + description + ", " : "") +
+            (timeSent != null ? "timeSent=" + timeSent + ", " : "") +
+            (tokenValue != null ? "tokenValue=" + tokenValue + ", " : "") +
+            (received != null ? "received=" + received + ", " : "") +
+            (actioned != null ? "actioned=" + actioned + ", " : "") +
+            (contentFullyEnqueued != null ? "contentFullyEnqueued=" + contentFullyEnqueued + ", " : "") +
             "}";
     }
 }

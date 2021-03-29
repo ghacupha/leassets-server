@@ -52,6 +52,29 @@ public class CurrencyTableServiceImpl implements CurrencyTableService {
     }
 
     @Override
+    public Optional<CurrencyTableDTO> partialUpdate(CurrencyTableDTO currencyTableDTO) {
+        log.debug("Request to partially update CurrencyTable : {}", currencyTableDTO);
+
+        return currencyTableRepository
+            .findById(currencyTableDTO.getId())
+            .map(
+                existingCurrencyTable -> {
+                    currencyTableMapper.partialUpdate(existingCurrencyTable, currencyTableDTO);
+                    return existingCurrencyTable;
+                }
+            )
+            .map(currencyTableRepository::save)
+            .map(
+                savedCurrencyTable -> {
+                    currencyTableSearchRepository.save(savedCurrencyTable);
+
+                    return savedCurrencyTable;
+                }
+            )
+            .map(currencyTableMapper::toDto);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<CurrencyTableDTO> findAll(Pageable pageable) {
         log.debug("Request to get all CurrencyTables");

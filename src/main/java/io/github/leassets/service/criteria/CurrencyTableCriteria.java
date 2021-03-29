@@ -71,11 +71,25 @@ public class CurrencyTableCriteria implements Serializable, Criteria {
         return id;
     }
 
+    public LongFilter id() {
+        if (id == null) {
+            id = new LongFilter();
+        }
+        return id;
+    }
+
     public void setId(LongFilter id) {
         this.id = id;
     }
 
     public StringFilter getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public StringFilter currencyCode() {
+        if (currencyCode == null) {
+            currencyCode = new StringFilter();
+        }
         return currencyCode;
     }
 
@@ -87,6 +101,13 @@ public class CurrencyTableCriteria implements Serializable, Criteria {
         return locality;
     }
 
+    public CurrencyLocalityFilter locality() {
+        if (locality == null) {
+            locality = new CurrencyLocalityFilter();
+        }
+        return locality;
+    }
+
     public void setLocality(CurrencyLocalityFilter locality) {
         this.locality = locality;
     }
@@ -95,11 +116,25 @@ public class CurrencyTableCriteria implements Serializable, Criteria {
         return currencyName;
     }
 
+    public StringFilter currencyName() {
+        if (currencyName == null) {
+            currencyName = new StringFilter();
+        }
+        return currencyName;
+    }
+
     public void setCurrencyName(StringFilter currencyName) {
         this.currencyName = currencyName;
     }
 
     public StringFilter getCountry() {
+        return country;
+    }
+
+    public StringFilter country() {
+        if (country == null) {
+            country = new StringFilter();
+        }
         return country;
     }
 
@@ -134,11 +169,11 @@ public class CurrencyTableCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "CurrencyTableCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (currencyCode != null ? "currencyCode=" + currencyCode + ", " : "") +
-                (locality != null ? "locality=" + locality + ", " : "") +
-                (currencyName != null ? "currencyName=" + currencyName + ", " : "") +
-                (country != null ? "country=" + country + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (currencyCode != null ? "currencyCode=" + currencyCode + ", " : "") +
+            (locality != null ? "locality=" + locality + ", " : "") +
+            (currencyName != null ? "currencyName=" + currencyName + ", " : "") +
+            (country != null ? "country=" + country + ", " : "") +
             "}";
     }
 }

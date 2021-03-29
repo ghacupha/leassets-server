@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data  repository for the CurrencyTable entity.
+ * Spring Data SQL repository for the CurrencyTable entity.
  */
 @SuppressWarnings("unused")
 @Repository

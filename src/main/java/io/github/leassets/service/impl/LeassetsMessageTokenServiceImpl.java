@@ -52,6 +52,29 @@ public class LeassetsMessageTokenServiceImpl implements LeassetsMessageTokenServ
     }
 
     @Override
+    public Optional<LeassetsMessageTokenDTO> partialUpdate(LeassetsMessageTokenDTO leassetsMessageTokenDTO) {
+        log.debug("Request to partially update LeassetsMessageToken : {}", leassetsMessageTokenDTO);
+
+        return leassetsMessageTokenRepository
+            .findById(leassetsMessageTokenDTO.getId())
+            .map(
+                existingLeassetsMessageToken -> {
+                    leassetsMessageTokenMapper.partialUpdate(existingLeassetsMessageToken, leassetsMessageTokenDTO);
+                    return existingLeassetsMessageToken;
+                }
+            )
+            .map(leassetsMessageTokenRepository::save)
+            .map(
+                savedLeassetsMessageToken -> {
+                    leassetsMessageTokenSearchRepository.save(savedLeassetsMessageToken);
+
+                    return savedLeassetsMessageToken;
+                }
+            )
+            .map(leassetsMessageTokenMapper::toDto);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<LeassetsMessageTokenDTO> findAll(Pageable pageable) {
         log.debug("Request to get all LeassetsMessageTokens");

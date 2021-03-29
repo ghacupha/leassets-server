@@ -52,6 +52,29 @@ public class LeassetsFileUploadServiceImpl implements LeassetsFileUploadService 
     }
 
     @Override
+    public Optional<LeassetsFileUploadDTO> partialUpdate(LeassetsFileUploadDTO leassetsFileUploadDTO) {
+        log.debug("Request to partially update LeassetsFileUpload : {}", leassetsFileUploadDTO);
+
+        return leassetsFileUploadRepository
+            .findById(leassetsFileUploadDTO.getId())
+            .map(
+                existingLeassetsFileUpload -> {
+                    leassetsFileUploadMapper.partialUpdate(existingLeassetsFileUpload, leassetsFileUploadDTO);
+                    return existingLeassetsFileUpload;
+                }
+            )
+            .map(leassetsFileUploadRepository::save)
+            .map(
+                savedLeassetsFileUpload -> {
+                    leassetsFileUploadSearchRepository.save(savedLeassetsFileUpload);
+
+                    return savedLeassetsFileUpload;
+                }
+            )
+            .map(leassetsFileUploadMapper::toDto);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<LeassetsFileUploadDTO> findAll(Pageable pageable) {
         log.debug("Request to get all LeassetsFileUploads");

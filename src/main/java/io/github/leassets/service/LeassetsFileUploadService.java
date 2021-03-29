@@ -18,6 +18,14 @@ public interface LeassetsFileUploadService {
     LeassetsFileUploadDTO save(LeassetsFileUploadDTO leassetsFileUploadDTO);
 
     /**
+     * Partially updates a leassetsFileUpload.
+     *
+     * @param leassetsFileUploadDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    Optional<LeassetsFileUploadDTO> partialUpdate(LeassetsFileUploadDTO leassetsFileUploadDTO);
+
+    /**
      * Get all the leassetsFileUploads.
      *
      * @param pageable the pagination information.

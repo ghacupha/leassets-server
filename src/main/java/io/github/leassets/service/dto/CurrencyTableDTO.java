@@ -2,6 +2,7 @@ package io.github.leassets.service.dto;
 
 import io.github.leassets.domain.enumeration.CurrencyLocality;
 import java.io.Serializable;
+import java.util.Objects;
 import javax.validation.constraints.*;
 
 /**
@@ -70,12 +71,16 @@ public class CurrencyTableDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((CurrencyTableDTO) o).id);
+        CurrencyTableDTO currencyTableDTO = (CurrencyTableDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, currencyTableDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore

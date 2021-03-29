@@ -18,6 +18,14 @@ public interface LeassetsMessageTokenService {
     LeassetsMessageTokenDTO save(LeassetsMessageTokenDTO leassetsMessageTokenDTO);
 
     /**
+     * Partially updates a leassetsMessageToken.
+     *
+     * @param leassetsMessageTokenDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    Optional<LeassetsMessageTokenDTO> partialUpdate(LeassetsMessageTokenDTO leassetsMessageTokenDTO);
+
+    /**
      * Get all the leassetsMessageTokens.
      *
      * @param pageable the pagination information.

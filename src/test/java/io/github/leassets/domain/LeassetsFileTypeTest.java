@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.leassets.web.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 
-public class LeassetsFileTypeTest {
+class LeassetsFileTypeTest {
 
     @Test
-    public void equalsVerifier() throws Exception {
+    void equalsVerifier() throws Exception {
         TestUtil.equalsVerifier(LeassetsFileType.class);
         LeassetsFileType leassetsFileType1 = new LeassetsFileType();
         leassetsFileType1.setId(1L);

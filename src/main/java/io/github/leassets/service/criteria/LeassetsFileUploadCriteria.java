@@ -66,11 +66,25 @@ public class LeassetsFileUploadCriteria implements Serializable, Criteria {
         return id;
     }
 
+    public LongFilter id() {
+        if (id == null) {
+            id = new LongFilter();
+        }
+        return id;
+    }
+
     public void setId(LongFilter id) {
         this.id = id;
     }
 
     public StringFilter getDescription() {
+        return description;
+    }
+
+    public StringFilter description() {
+        if (description == null) {
+            description = new StringFilter();
+        }
         return description;
     }
 
@@ -82,11 +96,25 @@ public class LeassetsFileUploadCriteria implements Serializable, Criteria {
         return fileName;
     }
 
+    public StringFilter fileName() {
+        if (fileName == null) {
+            fileName = new StringFilter();
+        }
+        return fileName;
+    }
+
     public void setFileName(StringFilter fileName) {
         this.fileName = fileName;
     }
 
     public LocalDateFilter getPeriodFrom() {
+        return periodFrom;
+    }
+
+    public LocalDateFilter periodFrom() {
+        if (periodFrom == null) {
+            periodFrom = new LocalDateFilter();
+        }
         return periodFrom;
     }
 
@@ -98,11 +126,25 @@ public class LeassetsFileUploadCriteria implements Serializable, Criteria {
         return periodTo;
     }
 
+    public LocalDateFilter periodTo() {
+        if (periodTo == null) {
+            periodTo = new LocalDateFilter();
+        }
+        return periodTo;
+    }
+
     public void setPeriodTo(LocalDateFilter periodTo) {
         this.periodTo = periodTo;
     }
 
     public LongFilter getLeassetsFileTypeId() {
+        return leassetsFileTypeId;
+    }
+
+    public LongFilter leassetsFileTypeId() {
+        if (leassetsFileTypeId == null) {
+            leassetsFileTypeId = new LongFilter();
+        }
         return leassetsFileTypeId;
     }
 
@@ -114,6 +156,13 @@ public class LeassetsFileUploadCriteria implements Serializable, Criteria {
         return uploadSuccessful;
     }
 
+    public BooleanFilter uploadSuccessful() {
+        if (uploadSuccessful == null) {
+            uploadSuccessful = new BooleanFilter();
+        }
+        return uploadSuccessful;
+    }
+
     public void setUploadSuccessful(BooleanFilter uploadSuccessful) {
         this.uploadSuccessful = uploadSuccessful;
     }
@@ -122,11 +171,25 @@ public class LeassetsFileUploadCriteria implements Serializable, Criteria {
         return uploadProcessed;
     }
 
+    public BooleanFilter uploadProcessed() {
+        if (uploadProcessed == null) {
+            uploadProcessed = new BooleanFilter();
+        }
+        return uploadProcessed;
+    }
+
     public void setUploadProcessed(BooleanFilter uploadProcessed) {
         this.uploadProcessed = uploadProcessed;
     }
 
     public StringFilter getUploadToken() {
+        return uploadToken;
+    }
+
+    public StringFilter uploadToken() {
+        if (uploadToken == null) {
+            uploadToken = new StringFilter();
+        }
         return uploadToken;
     }
 
@@ -175,15 +238,15 @@ public class LeassetsFileUploadCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "LeassetsFileUploadCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (description != null ? "description=" + description + ", " : "") +
-                (fileName != null ? "fileName=" + fileName + ", " : "") +
-                (periodFrom != null ? "periodFrom=" + periodFrom + ", " : "") +
-                (periodTo != null ? "periodTo=" + periodTo + ", " : "") +
-                (leassetsFileTypeId != null ? "leassetsFileTypeId=" + leassetsFileTypeId + ", " : "") +
-                (uploadSuccessful != null ? "uploadSuccessful=" + uploadSuccessful + ", " : "") +
-                (uploadProcessed != null ? "uploadProcessed=" + uploadProcessed + ", " : "") +
-                (uploadToken != null ? "uploadToken=" + uploadToken + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (description != null ? "description=" + description + ", " : "") +
+            (fileName != null ? "fileName=" + fileName + ", " : "") +
+            (periodFrom != null ? "periodFrom=" + periodFrom + ", " : "") +
+            (periodTo != null ? "periodTo=" + periodTo + ", " : "") +
+            (leassetsFileTypeId != null ? "leassetsFileTypeId=" + leassetsFileTypeId + ", " : "") +
+            (uploadSuccessful != null ? "uploadSuccessful=" + uploadSuccessful + ", " : "") +
+            (uploadProcessed != null ? "uploadProcessed=" + uploadProcessed + ", " : "") +
+            (uploadToken != null ? "uploadToken=" + uploadToken + ", " : "") +
             "}";
     }
 }

@@ -27,14 +27,16 @@ public interface IFileUploadResource {
         throws URISyntaxException;
 
     /**
-     * {@code PUT  /file-uploads} : Updates an existing fileUpload.
+     * {@code PUT  /leassets-file-uploads/:id} : Updates an existing leassetsFileUpload.
      *
-     * @param fileUploadDTO the fileUploadDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated fileUploadDTO, or with status {@code 400 (Bad Request)} if the fileUploadDTO is not valid, or with
-     * status {@code 500 (Internal Server Error)} if the fileUploadDTO couldn't be updated.
+     * @param id the id of the leassetsFileUploadDTO to save.
+     * @param fileUploadDTO the leassetsFileUploadDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated leassetsFileUploadDTO,
+     * or with status {@code 400 (Bad Request)} if the leassetsFileUploadDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the leassetsFileUploadDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    ResponseEntity<LeassetsFileUploadDTO> updateFileUpload(@Valid @RequestBody LeassetsFileUploadDTO fileUploadDTO)
+    ResponseEntity<LeassetsFileUploadDTO> updateFileUpload(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody LeassetsFileUploadDTO fileUploadDTO)
         throws URISyntaxException;
 
     /**

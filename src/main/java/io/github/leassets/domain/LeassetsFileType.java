@@ -57,8 +57,13 @@ public class LeassetsFileType implements Serializable {
         this.id = id;
     }
 
+    public LeassetsFileType id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getLeassetsFileTypeName() {
-        return leassetsFileTypeName;
+        return this.leassetsFileTypeName;
     }
 
     public LeassetsFileType leassetsFileTypeName(String leassetsFileTypeName) {
@@ -71,7 +76,7 @@ public class LeassetsFileType implements Serializable {
     }
 
     public LeassetsFileMediumTypes getLeassetsFileMediumType() {
-        return leassetsFileMediumType;
+        return this.leassetsFileMediumType;
     }
 
     public LeassetsFileType leassetsFileMediumType(LeassetsFileMediumTypes leassetsFileMediumType) {
@@ -84,7 +89,7 @@ public class LeassetsFileType implements Serializable {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public LeassetsFileType description(String description) {
@@ -97,7 +102,7 @@ public class LeassetsFileType implements Serializable {
     }
 
     public byte[] getFileTemplate() {
-        return fileTemplate;
+        return this.fileTemplate;
     }
 
     public LeassetsFileType fileTemplate(byte[] fileTemplate) {
@@ -110,7 +115,7 @@ public class LeassetsFileType implements Serializable {
     }
 
     public String getFileTemplateContentType() {
-        return fileTemplateContentType;
+        return this.fileTemplateContentType;
     }
 
     public LeassetsFileType fileTemplateContentType(String fileTemplateContentType) {
@@ -123,7 +128,7 @@ public class LeassetsFileType implements Serializable {
     }
 
     public LeassetsFileModelType getLeassetsfileType() {
-        return leassetsfileType;
+        return this.leassetsfileType;
     }
 
     public LeassetsFileType leassetsfileType(LeassetsFileModelType leassetsfileType) {
@@ -150,7 +155,8 @@ public class LeassetsFileType implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

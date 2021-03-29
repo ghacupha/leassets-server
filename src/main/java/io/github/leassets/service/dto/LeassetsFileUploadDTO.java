@@ -2,6 +2,7 @@ package io.github.leassets.service.dto;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 import javax.persistence.Lob;
 import javax.validation.constraints.*;
 
@@ -99,7 +100,7 @@ public class LeassetsFileUploadDTO implements Serializable {
         this.dataFileContentType = dataFileContentType;
     }
 
-    public Boolean isUploadSuccessful() {
+    public Boolean getUploadSuccessful() {
         return uploadSuccessful;
     }
 
@@ -107,7 +108,7 @@ public class LeassetsFileUploadDTO implements Serializable {
         this.uploadSuccessful = uploadSuccessful;
     }
 
-    public Boolean isUploadProcessed() {
+    public Boolean getUploadProcessed() {
         return uploadProcessed;
     }
 
@@ -132,12 +133,16 @@ public class LeassetsFileUploadDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((LeassetsFileUploadDTO) o).id);
+        LeassetsFileUploadDTO leassetsFileUploadDTO = (LeassetsFileUploadDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, leassetsFileUploadDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -151,8 +156,8 @@ public class LeassetsFileUploadDTO implements Serializable {
             ", periodTo='" + getPeriodTo() + "'" +
             ", leassetsFileTypeId=" + getLeassetsFileTypeId() +
             ", dataFile='" + getDataFile() + "'" +
-            ", uploadSuccessful='" + isUploadSuccessful() + "'" +
-            ", uploadProcessed='" + isUploadProcessed() + "'" +
+            ", uploadSuccessful='" + getUploadSuccessful() + "'" +
+            ", uploadProcessed='" + getUploadProcessed() + "'" +
             ", uploadToken='" + getUploadToken() + "'" +
             "}";
     }

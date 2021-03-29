@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.leassets.web.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 
-public class LeassetsMessageTokenDTOTest {
+class LeassetsMessageTokenDTOTest {
 
     @Test
-    public void dtoEqualsVerifier() throws Exception {
+    void dtoEqualsVerifier() throws Exception {
         TestUtil.equalsVerifier(LeassetsMessageTokenDTO.class);
         LeassetsMessageTokenDTO leassetsMessageTokenDTO1 = new LeassetsMessageTokenDTO();
         leassetsMessageTokenDTO1.setId(1L);

@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.leassets.web.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 
-public class CurrencyTableDTOTest {
+class CurrencyTableDTOTest {
 
     @Test
-    public void dtoEqualsVerifier() throws Exception {
+    void dtoEqualsVerifier() throws Exception {
         TestUtil.equalsVerifier(CurrencyTableDTO.class);
         CurrencyTableDTO currencyTableDTO1 = new CurrencyTableDTO();
         currencyTableDTO1.setId(1L);

@@ -45,7 +45,15 @@
     "reactive": false,
     "nativeLanguage": "en",
     "languages": ["en", "fr"],
-    "entities": ["FixedAssetAcquisition", "FixedAssetNetBookValue", "FixedAssetDepreciation"],
+    "entities": [
+      "FixedAssetAcquisition",
+      "FixedAssetNetBookValue",
+      "FixedAssetDepreciation",
+      "CurrencyTable",
+      "LeassetsFileType",
+      "LeassetsFileUpload",
+      "LeassetsMessageToken"
+    ],
     "lastLiquibaseTimestamp": 1616499421000
   },
   "generator-jhipster-file-handling": {

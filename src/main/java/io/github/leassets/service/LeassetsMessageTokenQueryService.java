@@ -8,6 +8,7 @@ import io.github.leassets.service.criteria.LeassetsMessageTokenCriteria;
 import io.github.leassets.service.dto.LeassetsMessageTokenDTO;
 import io.github.leassets.service.mapper.LeassetsMessageTokenMapper;
 import java.util.List;
+import javax.persistence.criteria.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

@@ -67,8 +67,13 @@ public class LeassetsFileUpload implements Serializable {
         this.id = id;
     }
 
+    public LeassetsFileUpload id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public LeassetsFileUpload description(String description) {
@@ -81,7 +86,7 @@ public class LeassetsFileUpload implements Serializable {
     }
 
     public String getFileName() {
-        return fileName;
+        return this.fileName;
     }
 
     public LeassetsFileUpload fileName(String fileName) {
@@ -94,7 +99,7 @@ public class LeassetsFileUpload implements Serializable {
     }
 
     public LocalDate getPeriodFrom() {
-        return periodFrom;
+        return this.periodFrom;
     }
 
     public LeassetsFileUpload periodFrom(LocalDate periodFrom) {
@@ -107,7 +112,7 @@ public class LeassetsFileUpload implements Serializable {
     }
 
     public LocalDate getPeriodTo() {
-        return periodTo;
+        return this.periodTo;
     }
 
     public LeassetsFileUpload periodTo(LocalDate periodTo) {
@@ -120,7 +125,7 @@ public class LeassetsFileUpload implements Serializable {
     }
 
     public Long getLeassetsFileTypeId() {
-        return leassetsFileTypeId;
+        return this.leassetsFileTypeId;
     }
 
     public LeassetsFileUpload leassetsFileTypeId(Long leassetsFileTypeId) {
@@ -133,7 +138,7 @@ public class LeassetsFileUpload implements Serializable {
     }
 
     public byte[] getDataFile() {
-        return dataFile;
+        return this.dataFile;
     }
 
     public LeassetsFileUpload dataFile(byte[] dataFile) {
@@ -146,7 +151,7 @@ public class LeassetsFileUpload implements Serializable {
     }
 
     public String getDataFileContentType() {
-        return dataFileContentType;
+        return this.dataFileContentType;
     }
 
     public LeassetsFileUpload dataFileContentType(String dataFileContentType) {
@@ -158,8 +163,8 @@ public class LeassetsFileUpload implements Serializable {
         this.dataFileContentType = dataFileContentType;
     }
 
-    public Boolean isUploadSuccessful() {
-        return uploadSuccessful;
+    public Boolean getUploadSuccessful() {
+        return this.uploadSuccessful;
     }
 
     public LeassetsFileUpload uploadSuccessful(Boolean uploadSuccessful) {
@@ -171,8 +176,8 @@ public class LeassetsFileUpload implements Serializable {
         this.uploadSuccessful = uploadSuccessful;
     }
 
-    public Boolean isUploadProcessed() {
-        return uploadProcessed;
+    public Boolean getUploadProcessed() {
+        return this.uploadProcessed;
     }
 
     public LeassetsFileUpload uploadProcessed(Boolean uploadProcessed) {
@@ -185,7 +190,7 @@ public class LeassetsFileUpload implements Serializable {
     }
 
     public String getUploadToken() {
-        return uploadToken;
+        return this.uploadToken;
     }
 
     public LeassetsFileUpload uploadToken(String uploadToken) {
@@ -212,7 +217,8 @@ public class LeassetsFileUpload implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore
@@ -227,8 +233,8 @@ public class LeassetsFileUpload implements Serializable {
             ", leassetsFileTypeId=" + getLeassetsFileTypeId() +
             ", dataFile='" + getDataFile() + "'" +
             ", dataFileContentType='" + getDataFileContentType() + "'" +
-            ", uploadSuccessful='" + isUploadSuccessful() + "'" +
-            ", uploadProcessed='" + isUploadProcessed() + "'" +
+            ", uploadSuccessful='" + getUploadSuccessful() + "'" +
+            ", uploadProcessed='" + getUploadProcessed() + "'" +
             ", uploadToken='" + getUploadToken() + "'" +
             "}";
     }

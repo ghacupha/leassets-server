@@ -1,6 +1,7 @@
 package io.github.leassets.service.dto;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.validation.constraints.*;
 
 /**
@@ -56,7 +57,7 @@ public class LeassetsMessageTokenDTO implements Serializable {
         this.tokenValue = tokenValue;
     }
 
-    public Boolean isReceived() {
+    public Boolean getReceived() {
         return received;
     }
 
@@ -64,7 +65,7 @@ public class LeassetsMessageTokenDTO implements Serializable {
         this.received = received;
     }
 
-    public Boolean isActioned() {
+    public Boolean getActioned() {
         return actioned;
     }
 
@@ -72,7 +73,7 @@ public class LeassetsMessageTokenDTO implements Serializable {
         this.actioned = actioned;
     }
 
-    public Boolean isContentFullyEnqueued() {
+    public Boolean getContentFullyEnqueued() {
         return contentFullyEnqueued;
     }
 
@@ -89,12 +90,16 @@ public class LeassetsMessageTokenDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((LeassetsMessageTokenDTO) o).id);
+        LeassetsMessageTokenDTO leassetsMessageTokenDTO = (LeassetsMessageTokenDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, leassetsMessageTokenDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -105,9 +110,9 @@ public class LeassetsMessageTokenDTO implements Serializable {
             ", description='" + getDescription() + "'" +
             ", timeSent=" + getTimeSent() +
             ", tokenValue='" + getTokenValue() + "'" +
-            ", received='" + isReceived() + "'" +
-            ", actioned='" + isActioned() + "'" +
-            ", contentFullyEnqueued='" + isContentFullyEnqueued() + "'" +
+            ", received='" + getReceived() + "'" +
+            ", actioned='" + getActioned() + "'" +
+            ", contentFullyEnqueued='" + getContentFullyEnqueued() + "'" +
             "}";
     }
 }

@@ -7,25 +7,26 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import io.github.leassets.LeassetsServerApp;
+import io.github.leassets.IntegrationTest;
 import io.github.leassets.domain.CurrencyTable;
 import io.github.leassets.domain.enumeration.CurrencyLocality;
 import io.github.leassets.repository.CurrencyTableRepository;
 import io.github.leassets.repository.search.CurrencyTableSearchRepository;
-import io.github.leassets.service.CurrencyTableQueryService;
-import io.github.leassets.service.CurrencyTableService;
+import io.github.leassets.service.criteria.CurrencyTableCriteria;
 import io.github.leassets.service.dto.CurrencyTableDTO;
 import io.github.leassets.service.mapper.CurrencyTableMapper;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -36,11 +37,11 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Integration tests for the {@link CurrencyTableResource} REST controller.
  */
-@SpringBootTest(classes = LeassetsServerApp.class)
+@IntegrationTest
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
-public class CurrencyTableResourceIT {
+class CurrencyTableResourceIT {
 
     private static final String DEFAULT_CURRENCY_CODE = "AAA";
     private static final String UPDATED_CURRENCY_CODE = "BBB";
@@ -54,14 +55,18 @@ public class CurrencyTableResourceIT {
     private static final String DEFAULT_COUNTRY = "AAAAAAAAAA";
     private static final String UPDATED_COUNTRY = "BBBBBBBBBB";
 
+    private static final String ENTITY_API_URL = "/api/currency-tables";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+    private static final String ENTITY_SEARCH_API_URL = "/api/_search/currency-tables";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
     @Autowired
     private CurrencyTableRepository currencyTableRepository;
 
     @Autowired
     private CurrencyTableMapper currencyTableMapper;
-
-    @Autowired
-    private CurrencyTableService currencyTableService;
 
     /**
      * This repository is mocked in the io.github.leassets.repository.search test package.
@@ -70,9 +75,6 @@ public class CurrencyTableResourceIT {
      */
     @Autowired
     private CurrencyTableSearchRepository mockCurrencyTableSearchRepository;
-
-    @Autowired
-    private CurrencyTableQueryService currencyTableQueryService;
 
     @Autowired
     private EntityManager em;
@@ -119,15 +121,13 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void createCurrencyTable() throws Exception {
+    void createCurrencyTable() throws Exception {
         int databaseSizeBeforeCreate = currencyTableRepository.findAll().size();
         // Create the CurrencyTable
         CurrencyTableDTO currencyTableDTO = currencyTableMapper.toDto(currencyTable);
         restCurrencyTableMockMvc
             .perform(
-                post("/api/currency-tables")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
             )
             .andExpect(status().isCreated());
 
@@ -146,19 +146,17 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void createCurrencyTableWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = currencyTableRepository.findAll().size();
-
+    void createCurrencyTableWithExistingId() throws Exception {
         // Create the CurrencyTable with an existing ID
         currencyTable.setId(1L);
         CurrencyTableDTO currencyTableDTO = currencyTableMapper.toDto(currencyTable);
 
+        int databaseSizeBeforeCreate = currencyTableRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restCurrencyTableMockMvc
             .perform(
-                post("/api/currency-tables")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -172,7 +170,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void checkLocalityIsRequired() throws Exception {
+    void checkLocalityIsRequired() throws Exception {
         int databaseSizeBeforeTest = currencyTableRepository.findAll().size();
         // set the field null
         currencyTable.setLocality(null);
@@ -182,9 +180,7 @@ public class CurrencyTableResourceIT {
 
         restCurrencyTableMockMvc
             .perform(
-                post("/api/currency-tables")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -194,13 +190,13 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTables() throws Exception {
+    void getAllCurrencyTables() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
         // Get all the currencyTableList
         restCurrencyTableMockMvc
-            .perform(get("/api/currency-tables?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(currencyTable.getId().intValue())))
@@ -212,13 +208,13 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getCurrencyTable() throws Exception {
+    void getCurrencyTable() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
         // Get the currencyTable
         restCurrencyTableMockMvc
-            .perform(get("/api/currency-tables/{id}", currencyTable.getId()))
+            .perform(get(ENTITY_API_URL_ID, currencyTable.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(currencyTable.getId().intValue()))
@@ -230,7 +226,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getCurrencyTablesByIdFiltering() throws Exception {
+    void getCurrencyTablesByIdFiltering() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -248,7 +244,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyCodeIsEqualToSomething() throws Exception {
+    void getAllCurrencyTablesByCurrencyCodeIsEqualToSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -261,7 +257,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyCodeIsNotEqualToSomething() throws Exception {
+    void getAllCurrencyTablesByCurrencyCodeIsNotEqualToSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -274,7 +270,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyCodeIsInShouldWork() throws Exception {
+    void getAllCurrencyTablesByCurrencyCodeIsInShouldWork() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -287,7 +283,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyCodeIsNullOrNotNull() throws Exception {
+    void getAllCurrencyTablesByCurrencyCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -300,7 +296,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyCodeContainsSomething() throws Exception {
+    void getAllCurrencyTablesByCurrencyCodeContainsSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -313,7 +309,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyCodeNotContainsSomething() throws Exception {
+    void getAllCurrencyTablesByCurrencyCodeNotContainsSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -326,7 +322,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByLocalityIsEqualToSomething() throws Exception {
+    void getAllCurrencyTablesByLocalityIsEqualToSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -339,7 +335,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByLocalityIsNotEqualToSomething() throws Exception {
+    void getAllCurrencyTablesByLocalityIsNotEqualToSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -352,7 +348,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByLocalityIsInShouldWork() throws Exception {
+    void getAllCurrencyTablesByLocalityIsInShouldWork() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -365,7 +361,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByLocalityIsNullOrNotNull() throws Exception {
+    void getAllCurrencyTablesByLocalityIsNullOrNotNull() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -378,7 +374,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyNameIsEqualToSomething() throws Exception {
+    void getAllCurrencyTablesByCurrencyNameIsEqualToSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -391,7 +387,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyNameIsNotEqualToSomething() throws Exception {
+    void getAllCurrencyTablesByCurrencyNameIsNotEqualToSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -404,7 +400,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyNameIsInShouldWork() throws Exception {
+    void getAllCurrencyTablesByCurrencyNameIsInShouldWork() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -417,7 +413,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyNameIsNullOrNotNull() throws Exception {
+    void getAllCurrencyTablesByCurrencyNameIsNullOrNotNull() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -430,7 +426,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyNameContainsSomething() throws Exception {
+    void getAllCurrencyTablesByCurrencyNameContainsSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -443,7 +439,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCurrencyNameNotContainsSomething() throws Exception {
+    void getAllCurrencyTablesByCurrencyNameNotContainsSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -456,7 +452,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCountryIsEqualToSomething() throws Exception {
+    void getAllCurrencyTablesByCountryIsEqualToSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -469,7 +465,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCountryIsNotEqualToSomething() throws Exception {
+    void getAllCurrencyTablesByCountryIsNotEqualToSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -482,7 +478,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCountryIsInShouldWork() throws Exception {
+    void getAllCurrencyTablesByCountryIsInShouldWork() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -495,7 +491,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCountryIsNullOrNotNull() throws Exception {
+    void getAllCurrencyTablesByCountryIsNullOrNotNull() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -508,7 +504,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCountryContainsSomething() throws Exception {
+    void getAllCurrencyTablesByCountryContainsSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -521,7 +517,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getAllCurrencyTablesByCountryNotContainsSomething() throws Exception {
+    void getAllCurrencyTablesByCountryNotContainsSomething() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -537,7 +533,7 @@ public class CurrencyTableResourceIT {
      */
     private void defaultCurrencyTableShouldBeFound(String filter) throws Exception {
         restCurrencyTableMockMvc
-            .perform(get("/api/currency-tables?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(currencyTable.getId().intValue())))
@@ -548,7 +544,7 @@ public class CurrencyTableResourceIT {
 
         // Check, that the count call also returns 1
         restCurrencyTableMockMvc
-            .perform(get("/api/currency-tables/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -559,7 +555,7 @@ public class CurrencyTableResourceIT {
      */
     private void defaultCurrencyTableShouldNotBeFound(String filter) throws Exception {
         restCurrencyTableMockMvc
-            .perform(get("/api/currency-tables?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -567,7 +563,7 @@ public class CurrencyTableResourceIT {
 
         // Check, that the count call also returns 0
         restCurrencyTableMockMvc
-            .perform(get("/api/currency-tables/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -575,14 +571,14 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingCurrencyTable() throws Exception {
+    void getNonExistingCurrencyTable() throws Exception {
         // Get the currencyTable
-        restCurrencyTableMockMvc.perform(get("/api/currency-tables/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restCurrencyTableMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateCurrencyTable() throws Exception {
+    void putNewCurrencyTable() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -601,7 +597,7 @@ public class CurrencyTableResourceIT {
 
         restCurrencyTableMockMvc
             .perform(
-                put("/api/currency-tables")
+                put(ENTITY_API_URL_ID, currencyTableDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
             )
@@ -617,13 +613,14 @@ public class CurrencyTableResourceIT {
         assertThat(testCurrencyTable.getCountry()).isEqualTo(UPDATED_COUNTRY);
 
         // Validate the CurrencyTable in Elasticsearch
-        verify(mockCurrencyTableSearchRepository, times(1)).save(testCurrencyTable);
+        verify(mockCurrencyTableSearchRepository).save(testCurrencyTable);
     }
 
     @Test
     @Transactional
-    public void updateNonExistingCurrencyTable() throws Exception {
+    void putNonExistingCurrencyTable() throws Exception {
         int databaseSizeBeforeUpdate = currencyTableRepository.findAll().size();
+        currencyTable.setId(count.incrementAndGet());
 
         // Create the CurrencyTable
         CurrencyTableDTO currencyTableDTO = currencyTableMapper.toDto(currencyTable);
@@ -631,7 +628,7 @@ public class CurrencyTableResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restCurrencyTableMockMvc
             .perform(
-                put("/api/currency-tables")
+                put(ENTITY_API_URL_ID, currencyTableDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
             )
@@ -647,7 +644,203 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void deleteCurrencyTable() throws Exception {
+    void putWithIdMismatchCurrencyTable() throws Exception {
+        int databaseSizeBeforeUpdate = currencyTableRepository.findAll().size();
+        currencyTable.setId(count.incrementAndGet());
+
+        // Create the CurrencyTable
+        CurrencyTableDTO currencyTableDTO = currencyTableMapper.toDto(currencyTable);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restCurrencyTableMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the CurrencyTable in the database
+        List<CurrencyTable> currencyTableList = currencyTableRepository.findAll();
+        assertThat(currencyTableList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the CurrencyTable in Elasticsearch
+        verify(mockCurrencyTableSearchRepository, times(0)).save(currencyTable);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamCurrencyTable() throws Exception {
+        int databaseSizeBeforeUpdate = currencyTableRepository.findAll().size();
+        currencyTable.setId(count.incrementAndGet());
+
+        // Create the CurrencyTable
+        CurrencyTableDTO currencyTableDTO = currencyTableMapper.toDto(currencyTable);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restCurrencyTableMockMvc
+            .perform(
+                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the CurrencyTable in the database
+        List<CurrencyTable> currencyTableList = currencyTableRepository.findAll();
+        assertThat(currencyTableList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the CurrencyTable in Elasticsearch
+        verify(mockCurrencyTableSearchRepository, times(0)).save(currencyTable);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateCurrencyTableWithPatch() throws Exception {
+        // Initialize the database
+        currencyTableRepository.saveAndFlush(currencyTable);
+
+        int databaseSizeBeforeUpdate = currencyTableRepository.findAll().size();
+
+        // Update the currencyTable using partial update
+        CurrencyTable partialUpdatedCurrencyTable = new CurrencyTable();
+        partialUpdatedCurrencyTable.setId(currencyTable.getId());
+
+        partialUpdatedCurrencyTable.currencyCode(UPDATED_CURRENCY_CODE).locality(UPDATED_LOCALITY).country(UPDATED_COUNTRY);
+
+        restCurrencyTableMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedCurrencyTable.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCurrencyTable))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the CurrencyTable in the database
+        List<CurrencyTable> currencyTableList = currencyTableRepository.findAll();
+        assertThat(currencyTableList).hasSize(databaseSizeBeforeUpdate);
+        CurrencyTable testCurrencyTable = currencyTableList.get(currencyTableList.size() - 1);
+        assertThat(testCurrencyTable.getCurrencyCode()).isEqualTo(UPDATED_CURRENCY_CODE);
+        assertThat(testCurrencyTable.getLocality()).isEqualTo(UPDATED_LOCALITY);
+        assertThat(testCurrencyTable.getCurrencyName()).isEqualTo(DEFAULT_CURRENCY_NAME);
+        assertThat(testCurrencyTable.getCountry()).isEqualTo(UPDATED_COUNTRY);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateCurrencyTableWithPatch() throws Exception {
+        // Initialize the database
+        currencyTableRepository.saveAndFlush(currencyTable);
+
+        int databaseSizeBeforeUpdate = currencyTableRepository.findAll().size();
+
+        // Update the currencyTable using partial update
+        CurrencyTable partialUpdatedCurrencyTable = new CurrencyTable();
+        partialUpdatedCurrencyTable.setId(currencyTable.getId());
+
+        partialUpdatedCurrencyTable
+            .currencyCode(UPDATED_CURRENCY_CODE)
+            .locality(UPDATED_LOCALITY)
+            .currencyName(UPDATED_CURRENCY_NAME)
+            .country(UPDATED_COUNTRY);
+
+        restCurrencyTableMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedCurrencyTable.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCurrencyTable))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the CurrencyTable in the database
+        List<CurrencyTable> currencyTableList = currencyTableRepository.findAll();
+        assertThat(currencyTableList).hasSize(databaseSizeBeforeUpdate);
+        CurrencyTable testCurrencyTable = currencyTableList.get(currencyTableList.size() - 1);
+        assertThat(testCurrencyTable.getCurrencyCode()).isEqualTo(UPDATED_CURRENCY_CODE);
+        assertThat(testCurrencyTable.getLocality()).isEqualTo(UPDATED_LOCALITY);
+        assertThat(testCurrencyTable.getCurrencyName()).isEqualTo(UPDATED_CURRENCY_NAME);
+        assertThat(testCurrencyTable.getCountry()).isEqualTo(UPDATED_COUNTRY);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingCurrencyTable() throws Exception {
+        int databaseSizeBeforeUpdate = currencyTableRepository.findAll().size();
+        currencyTable.setId(count.incrementAndGet());
+
+        // Create the CurrencyTable
+        CurrencyTableDTO currencyTableDTO = currencyTableMapper.toDto(currencyTable);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restCurrencyTableMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, currencyTableDTO.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the CurrencyTable in the database
+        List<CurrencyTable> currencyTableList = currencyTableRepository.findAll();
+        assertThat(currencyTableList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the CurrencyTable in Elasticsearch
+        verify(mockCurrencyTableSearchRepository, times(0)).save(currencyTable);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchCurrencyTable() throws Exception {
+        int databaseSizeBeforeUpdate = currencyTableRepository.findAll().size();
+        currencyTable.setId(count.incrementAndGet());
+
+        // Create the CurrencyTable
+        CurrencyTableDTO currencyTableDTO = currencyTableMapper.toDto(currencyTable);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restCurrencyTableMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the CurrencyTable in the database
+        List<CurrencyTable> currencyTableList = currencyTableRepository.findAll();
+        assertThat(currencyTableList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the CurrencyTable in Elasticsearch
+        verify(mockCurrencyTableSearchRepository, times(0)).save(currencyTable);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamCurrencyTable() throws Exception {
+        int databaseSizeBeforeUpdate = currencyTableRepository.findAll().size();
+        currencyTable.setId(count.incrementAndGet());
+
+        // Create the CurrencyTable
+        CurrencyTableDTO currencyTableDTO = currencyTableMapper.toDto(currencyTable);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restCurrencyTableMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(currencyTableDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the CurrencyTable in the database
+        List<CurrencyTable> currencyTableList = currencyTableRepository.findAll();
+        assertThat(currencyTableList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the CurrencyTable in Elasticsearch
+        verify(mockCurrencyTableSearchRepository, times(0)).save(currencyTable);
+    }
+
+    @Test
+    @Transactional
+    void deleteCurrencyTable() throws Exception {
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
 
@@ -655,7 +848,7 @@ public class CurrencyTableResourceIT {
 
         // Delete the currencyTable
         restCurrencyTableMockMvc
-            .perform(delete("/api/currency-tables/{id}", currencyTable.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, currencyTable.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
@@ -668,7 +861,7 @@ public class CurrencyTableResourceIT {
 
     @Test
     @Transactional
-    public void searchCurrencyTable() throws Exception {
+    void searchCurrencyTable() throws Exception {
         // Configure the mock search repository
         // Initialize the database
         currencyTableRepository.saveAndFlush(currencyTable);
@@ -677,7 +870,7 @@ public class CurrencyTableResourceIT {
 
         // Search the currencyTable
         restCurrencyTableMockMvc
-            .perform(get("/api/_search/currency-tables?query=id:" + currencyTable.getId()))
+            .perform(get(ENTITY_SEARCH_API_URL + "?query=id:" + currencyTable.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(currencyTable.getId().intValue())))

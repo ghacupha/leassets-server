@@ -48,6 +48,51 @@ public class LeassetsFileTypeService {
     }
 
     /**
+     * Partially update a leassetsFileType.
+     *
+     * @param leassetsFileType the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<LeassetsFileType> partialUpdate(LeassetsFileType leassetsFileType) {
+        log.debug("Request to partially update LeassetsFileType : {}", leassetsFileType);
+
+        return leassetsFileTypeRepository
+            .findById(leassetsFileType.getId())
+            .map(
+                existingLeassetsFileType -> {
+                    if (leassetsFileType.getLeassetsFileTypeName() != null) {
+                        existingLeassetsFileType.setLeassetsFileTypeName(leassetsFileType.getLeassetsFileTypeName());
+                    }
+                    if (leassetsFileType.getLeassetsFileMediumType() != null) {
+                        existingLeassetsFileType.setLeassetsFileMediumType(leassetsFileType.getLeassetsFileMediumType());
+                    }
+                    if (leassetsFileType.getDescription() != null) {
+                        existingLeassetsFileType.setDescription(leassetsFileType.getDescription());
+                    }
+                    if (leassetsFileType.getFileTemplate() != null) {
+                        existingLeassetsFileType.setFileTemplate(leassetsFileType.getFileTemplate());
+                    }
+                    if (leassetsFileType.getFileTemplateContentType() != null) {
+                        existingLeassetsFileType.setFileTemplateContentType(leassetsFileType.getFileTemplateContentType());
+                    }
+                    if (leassetsFileType.getLeassetsfileType() != null) {
+                        existingLeassetsFileType.setLeassetsfileType(leassetsFileType.getLeassetsfileType());
+                    }
+
+                    return existingLeassetsFileType;
+                }
+            )
+            .map(leassetsFileTypeRepository::save)
+            .map(
+                savedLeassetsFileType -> {
+                    leassetsFileTypeSearchRepository.save(savedLeassetsFileType);
+
+                    return savedLeassetsFileType;
+                }
+            );
+    }
+
+    /**
      * Get all the leassetsFileTypes.
      *
      * @param pageable the pagination information.

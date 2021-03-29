@@ -7,24 +7,25 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import io.github.leassets.LeassetsServerApp;
+import io.github.leassets.IntegrationTest;
 import io.github.leassets.domain.LeassetsMessageToken;
 import io.github.leassets.repository.LeassetsMessageTokenRepository;
 import io.github.leassets.repository.search.LeassetsMessageTokenSearchRepository;
-import io.github.leassets.service.LeassetsMessageTokenQueryService;
-import io.github.leassets.service.LeassetsMessageTokenService;
+import io.github.leassets.service.criteria.LeassetsMessageTokenCriteria;
 import io.github.leassets.service.dto.LeassetsMessageTokenDTO;
 import io.github.leassets.service.mapper.LeassetsMessageTokenMapper;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -35,11 +36,11 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Integration tests for the {@link LeassetsMessageTokenResource} REST controller.
  */
-@SpringBootTest(classes = LeassetsServerApp.class)
+@IntegrationTest
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
-public class LeassetsMessageTokenResourceIT {
+class LeassetsMessageTokenResourceIT {
 
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
@@ -60,14 +61,18 @@ public class LeassetsMessageTokenResourceIT {
     private static final Boolean DEFAULT_CONTENT_FULLY_ENQUEUED = false;
     private static final Boolean UPDATED_CONTENT_FULLY_ENQUEUED = true;
 
+    private static final String ENTITY_API_URL = "/api/leassets-message-tokens";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+    private static final String ENTITY_SEARCH_API_URL = "/api/_search/leassets-message-tokens";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
     @Autowired
     private LeassetsMessageTokenRepository leassetsMessageTokenRepository;
 
     @Autowired
     private LeassetsMessageTokenMapper leassetsMessageTokenMapper;
-
-    @Autowired
-    private LeassetsMessageTokenService leassetsMessageTokenService;
 
     /**
      * This repository is mocked in the io.github.leassets.repository.search test package.
@@ -76,9 +81,6 @@ public class LeassetsMessageTokenResourceIT {
      */
     @Autowired
     private LeassetsMessageTokenSearchRepository mockLeassetsMessageTokenSearchRepository;
-
-    @Autowired
-    private LeassetsMessageTokenQueryService leassetsMessageTokenQueryService;
 
     @Autowired
     private EntityManager em;
@@ -129,13 +131,13 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void createLeassetsMessageToken() throws Exception {
+    void createLeassetsMessageToken() throws Exception {
         int databaseSizeBeforeCreate = leassetsMessageTokenRepository.findAll().size();
         // Create the LeassetsMessageToken
         LeassetsMessageTokenDTO leassetsMessageTokenDTO = leassetsMessageTokenMapper.toDto(leassetsMessageToken);
         restLeassetsMessageTokenMockMvc
             .perform(
-                post("/api/leassets-message-tokens")
+                post(ENTITY_API_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
             )
@@ -148,9 +150,9 @@ public class LeassetsMessageTokenResourceIT {
         assertThat(testLeassetsMessageToken.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
         assertThat(testLeassetsMessageToken.getTimeSent()).isEqualTo(DEFAULT_TIME_SENT);
         assertThat(testLeassetsMessageToken.getTokenValue()).isEqualTo(DEFAULT_TOKEN_VALUE);
-        assertThat(testLeassetsMessageToken.isReceived()).isEqualTo(DEFAULT_RECEIVED);
-        assertThat(testLeassetsMessageToken.isActioned()).isEqualTo(DEFAULT_ACTIONED);
-        assertThat(testLeassetsMessageToken.isContentFullyEnqueued()).isEqualTo(DEFAULT_CONTENT_FULLY_ENQUEUED);
+        assertThat(testLeassetsMessageToken.getReceived()).isEqualTo(DEFAULT_RECEIVED);
+        assertThat(testLeassetsMessageToken.getActioned()).isEqualTo(DEFAULT_ACTIONED);
+        assertThat(testLeassetsMessageToken.getContentFullyEnqueued()).isEqualTo(DEFAULT_CONTENT_FULLY_ENQUEUED);
 
         // Validate the LeassetsMessageToken in Elasticsearch
         verify(mockLeassetsMessageTokenSearchRepository, times(1)).save(testLeassetsMessageToken);
@@ -158,17 +160,17 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void createLeassetsMessageTokenWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = leassetsMessageTokenRepository.findAll().size();
-
+    void createLeassetsMessageTokenWithExistingId() throws Exception {
         // Create the LeassetsMessageToken with an existing ID
         leassetsMessageToken.setId(1L);
         LeassetsMessageTokenDTO leassetsMessageTokenDTO = leassetsMessageTokenMapper.toDto(leassetsMessageToken);
 
+        int databaseSizeBeforeCreate = leassetsMessageTokenRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restLeassetsMessageTokenMockMvc
             .perform(
-                post("/api/leassets-message-tokens")
+                post(ENTITY_API_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
             )
@@ -184,7 +186,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void checkTimeSentIsRequired() throws Exception {
+    void checkTimeSentIsRequired() throws Exception {
         int databaseSizeBeforeTest = leassetsMessageTokenRepository.findAll().size();
         // set the field null
         leassetsMessageToken.setTimeSent(null);
@@ -194,7 +196,7 @@ public class LeassetsMessageTokenResourceIT {
 
         restLeassetsMessageTokenMockMvc
             .perform(
-                post("/api/leassets-message-tokens")
+                post(ENTITY_API_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
             )
@@ -206,7 +208,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void checkTokenValueIsRequired() throws Exception {
+    void checkTokenValueIsRequired() throws Exception {
         int databaseSizeBeforeTest = leassetsMessageTokenRepository.findAll().size();
         // set the field null
         leassetsMessageToken.setTokenValue(null);
@@ -216,7 +218,7 @@ public class LeassetsMessageTokenResourceIT {
 
         restLeassetsMessageTokenMockMvc
             .perform(
-                post("/api/leassets-message-tokens")
+                post(ENTITY_API_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
             )
@@ -228,13 +230,13 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokens() throws Exception {
+    void getAllLeassetsMessageTokens() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
         // Get all the leassetsMessageTokenList
         restLeassetsMessageTokenMockMvc
-            .perform(get("/api/leassets-message-tokens?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leassetsMessageToken.getId().intValue())))
@@ -248,13 +250,13 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getLeassetsMessageToken() throws Exception {
+    void getLeassetsMessageToken() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
         // Get the leassetsMessageToken
         restLeassetsMessageTokenMockMvc
-            .perform(get("/api/leassets-message-tokens/{id}", leassetsMessageToken.getId()))
+            .perform(get(ENTITY_API_URL_ID, leassetsMessageToken.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(leassetsMessageToken.getId().intValue()))
@@ -268,7 +270,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getLeassetsMessageTokensByIdFiltering() throws Exception {
+    void getLeassetsMessageTokensByIdFiltering() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -286,7 +288,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByDescriptionIsEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -299,7 +301,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByDescriptionIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByDescriptionIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -312,7 +314,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByDescriptionIsInShouldWork() throws Exception {
+    void getAllLeassetsMessageTokensByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -325,7 +327,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByDescriptionIsNullOrNotNull() throws Exception {
+    void getAllLeassetsMessageTokensByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -338,7 +340,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByDescriptionContainsSomething() throws Exception {
+    void getAllLeassetsMessageTokensByDescriptionContainsSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -351,7 +353,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByDescriptionNotContainsSomething() throws Exception {
+    void getAllLeassetsMessageTokensByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -364,7 +366,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTimeSentIsEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTimeSentIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -377,7 +379,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTimeSentIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTimeSentIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -390,7 +392,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTimeSentIsInShouldWork() throws Exception {
+    void getAllLeassetsMessageTokensByTimeSentIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -403,7 +405,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTimeSentIsNullOrNotNull() throws Exception {
+    void getAllLeassetsMessageTokensByTimeSentIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -416,7 +418,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTimeSentIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTimeSentIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -429,7 +431,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTimeSentIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTimeSentIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -442,7 +444,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTimeSentIsLessThanSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTimeSentIsLessThanSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -455,7 +457,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTimeSentIsGreaterThanSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTimeSentIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -468,7 +470,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTokenValueIsEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTokenValueIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -481,7 +483,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTokenValueIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTokenValueIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -494,7 +496,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTokenValueIsInShouldWork() throws Exception {
+    void getAllLeassetsMessageTokensByTokenValueIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -507,7 +509,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTokenValueIsNullOrNotNull() throws Exception {
+    void getAllLeassetsMessageTokensByTokenValueIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -520,7 +522,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTokenValueContainsSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTokenValueContainsSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -533,7 +535,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByTokenValueNotContainsSomething() throws Exception {
+    void getAllLeassetsMessageTokensByTokenValueNotContainsSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -546,7 +548,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByReceivedIsEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByReceivedIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -559,7 +561,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByReceivedIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByReceivedIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -572,7 +574,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByReceivedIsInShouldWork() throws Exception {
+    void getAllLeassetsMessageTokensByReceivedIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -585,7 +587,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByReceivedIsNullOrNotNull() throws Exception {
+    void getAllLeassetsMessageTokensByReceivedIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -598,7 +600,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByActionedIsEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByActionedIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -611,7 +613,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByActionedIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByActionedIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -624,7 +626,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByActionedIsInShouldWork() throws Exception {
+    void getAllLeassetsMessageTokensByActionedIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -637,7 +639,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByActionedIsNullOrNotNull() throws Exception {
+    void getAllLeassetsMessageTokensByActionedIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -650,7 +652,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByContentFullyEnqueuedIsEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByContentFullyEnqueuedIsEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -663,7 +665,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByContentFullyEnqueuedIsNotEqualToSomething() throws Exception {
+    void getAllLeassetsMessageTokensByContentFullyEnqueuedIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -676,7 +678,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByContentFullyEnqueuedIsInShouldWork() throws Exception {
+    void getAllLeassetsMessageTokensByContentFullyEnqueuedIsInShouldWork() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -691,7 +693,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeassetsMessageTokensByContentFullyEnqueuedIsNullOrNotNull() throws Exception {
+    void getAllLeassetsMessageTokensByContentFullyEnqueuedIsNullOrNotNull() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -707,7 +709,7 @@ public class LeassetsMessageTokenResourceIT {
      */
     private void defaultLeassetsMessageTokenShouldBeFound(String filter) throws Exception {
         restLeassetsMessageTokenMockMvc
-            .perform(get("/api/leassets-message-tokens?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leassetsMessageToken.getId().intValue())))
@@ -720,7 +722,7 @@ public class LeassetsMessageTokenResourceIT {
 
         // Check, that the count call also returns 1
         restLeassetsMessageTokenMockMvc
-            .perform(get("/api/leassets-message-tokens/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -731,7 +733,7 @@ public class LeassetsMessageTokenResourceIT {
      */
     private void defaultLeassetsMessageTokenShouldNotBeFound(String filter) throws Exception {
         restLeassetsMessageTokenMockMvc
-            .perform(get("/api/leassets-message-tokens?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -739,7 +741,7 @@ public class LeassetsMessageTokenResourceIT {
 
         // Check, that the count call also returns 0
         restLeassetsMessageTokenMockMvc
-            .perform(get("/api/leassets-message-tokens/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -747,14 +749,14 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingLeassetsMessageToken() throws Exception {
+    void getNonExistingLeassetsMessageToken() throws Exception {
         // Get the leassetsMessageToken
-        restLeassetsMessageTokenMockMvc.perform(get("/api/leassets-message-tokens/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restLeassetsMessageTokenMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateLeassetsMessageToken() throws Exception {
+    void putNewLeassetsMessageToken() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -775,7 +777,7 @@ public class LeassetsMessageTokenResourceIT {
 
         restLeassetsMessageTokenMockMvc
             .perform(
-                put("/api/leassets-message-tokens")
+                put(ENTITY_API_URL_ID, leassetsMessageTokenDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
             )
@@ -788,18 +790,19 @@ public class LeassetsMessageTokenResourceIT {
         assertThat(testLeassetsMessageToken.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
         assertThat(testLeassetsMessageToken.getTimeSent()).isEqualTo(UPDATED_TIME_SENT);
         assertThat(testLeassetsMessageToken.getTokenValue()).isEqualTo(UPDATED_TOKEN_VALUE);
-        assertThat(testLeassetsMessageToken.isReceived()).isEqualTo(UPDATED_RECEIVED);
-        assertThat(testLeassetsMessageToken.isActioned()).isEqualTo(UPDATED_ACTIONED);
-        assertThat(testLeassetsMessageToken.isContentFullyEnqueued()).isEqualTo(UPDATED_CONTENT_FULLY_ENQUEUED);
+        assertThat(testLeassetsMessageToken.getReceived()).isEqualTo(UPDATED_RECEIVED);
+        assertThat(testLeassetsMessageToken.getActioned()).isEqualTo(UPDATED_ACTIONED);
+        assertThat(testLeassetsMessageToken.getContentFullyEnqueued()).isEqualTo(UPDATED_CONTENT_FULLY_ENQUEUED);
 
         // Validate the LeassetsMessageToken in Elasticsearch
-        verify(mockLeassetsMessageTokenSearchRepository, times(1)).save(testLeassetsMessageToken);
+        verify(mockLeassetsMessageTokenSearchRepository).save(testLeassetsMessageToken);
     }
 
     @Test
     @Transactional
-    public void updateNonExistingLeassetsMessageToken() throws Exception {
+    void putNonExistingLeassetsMessageToken() throws Exception {
         int databaseSizeBeforeUpdate = leassetsMessageTokenRepository.findAll().size();
+        leassetsMessageToken.setId(count.incrementAndGet());
 
         // Create the LeassetsMessageToken
         LeassetsMessageTokenDTO leassetsMessageTokenDTO = leassetsMessageTokenMapper.toDto(leassetsMessageToken);
@@ -807,7 +810,7 @@ public class LeassetsMessageTokenResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restLeassetsMessageTokenMockMvc
             .perform(
-                put("/api/leassets-message-tokens")
+                put(ENTITY_API_URL_ID, leassetsMessageTokenDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
             )
@@ -823,7 +826,211 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void deleteLeassetsMessageToken() throws Exception {
+    void putWithIdMismatchLeassetsMessageToken() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsMessageTokenRepository.findAll().size();
+        leassetsMessageToken.setId(count.incrementAndGet());
+
+        // Create the LeassetsMessageToken
+        LeassetsMessageTokenDTO leassetsMessageTokenDTO = leassetsMessageTokenMapper.toDto(leassetsMessageToken);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeassetsMessageTokenMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeassetsMessageToken in the database
+        List<LeassetsMessageToken> leassetsMessageTokenList = leassetsMessageTokenRepository.findAll();
+        assertThat(leassetsMessageTokenList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsMessageToken in Elasticsearch
+        verify(mockLeassetsMessageTokenSearchRepository, times(0)).save(leassetsMessageToken);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamLeassetsMessageToken() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsMessageTokenRepository.findAll().size();
+        leassetsMessageToken.setId(count.incrementAndGet());
+
+        // Create the LeassetsMessageToken
+        LeassetsMessageTokenDTO leassetsMessageTokenDTO = leassetsMessageTokenMapper.toDto(leassetsMessageToken);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeassetsMessageTokenMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeassetsMessageToken in the database
+        List<LeassetsMessageToken> leassetsMessageTokenList = leassetsMessageTokenRepository.findAll();
+        assertThat(leassetsMessageTokenList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsMessageToken in Elasticsearch
+        verify(mockLeassetsMessageTokenSearchRepository, times(0)).save(leassetsMessageToken);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateLeassetsMessageTokenWithPatch() throws Exception {
+        // Initialize the database
+        leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
+
+        int databaseSizeBeforeUpdate = leassetsMessageTokenRepository.findAll().size();
+
+        // Update the leassetsMessageToken using partial update
+        LeassetsMessageToken partialUpdatedLeassetsMessageToken = new LeassetsMessageToken();
+        partialUpdatedLeassetsMessageToken.setId(leassetsMessageToken.getId());
+
+        partialUpdatedLeassetsMessageToken.description(UPDATED_DESCRIPTION).tokenValue(UPDATED_TOKEN_VALUE).received(UPDATED_RECEIVED);
+
+        restLeassetsMessageTokenMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeassetsMessageToken.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeassetsMessageToken))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeassetsMessageToken in the database
+        List<LeassetsMessageToken> leassetsMessageTokenList = leassetsMessageTokenRepository.findAll();
+        assertThat(leassetsMessageTokenList).hasSize(databaseSizeBeforeUpdate);
+        LeassetsMessageToken testLeassetsMessageToken = leassetsMessageTokenList.get(leassetsMessageTokenList.size() - 1);
+        assertThat(testLeassetsMessageToken.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testLeassetsMessageToken.getTimeSent()).isEqualTo(DEFAULT_TIME_SENT);
+        assertThat(testLeassetsMessageToken.getTokenValue()).isEqualTo(UPDATED_TOKEN_VALUE);
+        assertThat(testLeassetsMessageToken.getReceived()).isEqualTo(UPDATED_RECEIVED);
+        assertThat(testLeassetsMessageToken.getActioned()).isEqualTo(DEFAULT_ACTIONED);
+        assertThat(testLeassetsMessageToken.getContentFullyEnqueued()).isEqualTo(DEFAULT_CONTENT_FULLY_ENQUEUED);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateLeassetsMessageTokenWithPatch() throws Exception {
+        // Initialize the database
+        leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
+
+        int databaseSizeBeforeUpdate = leassetsMessageTokenRepository.findAll().size();
+
+        // Update the leassetsMessageToken using partial update
+        LeassetsMessageToken partialUpdatedLeassetsMessageToken = new LeassetsMessageToken();
+        partialUpdatedLeassetsMessageToken.setId(leassetsMessageToken.getId());
+
+        partialUpdatedLeassetsMessageToken
+            .description(UPDATED_DESCRIPTION)
+            .timeSent(UPDATED_TIME_SENT)
+            .tokenValue(UPDATED_TOKEN_VALUE)
+            .received(UPDATED_RECEIVED)
+            .actioned(UPDATED_ACTIONED)
+            .contentFullyEnqueued(UPDATED_CONTENT_FULLY_ENQUEUED);
+
+        restLeassetsMessageTokenMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeassetsMessageToken.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeassetsMessageToken))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeassetsMessageToken in the database
+        List<LeassetsMessageToken> leassetsMessageTokenList = leassetsMessageTokenRepository.findAll();
+        assertThat(leassetsMessageTokenList).hasSize(databaseSizeBeforeUpdate);
+        LeassetsMessageToken testLeassetsMessageToken = leassetsMessageTokenList.get(leassetsMessageTokenList.size() - 1);
+        assertThat(testLeassetsMessageToken.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testLeassetsMessageToken.getTimeSent()).isEqualTo(UPDATED_TIME_SENT);
+        assertThat(testLeassetsMessageToken.getTokenValue()).isEqualTo(UPDATED_TOKEN_VALUE);
+        assertThat(testLeassetsMessageToken.getReceived()).isEqualTo(UPDATED_RECEIVED);
+        assertThat(testLeassetsMessageToken.getActioned()).isEqualTo(UPDATED_ACTIONED);
+        assertThat(testLeassetsMessageToken.getContentFullyEnqueued()).isEqualTo(UPDATED_CONTENT_FULLY_ENQUEUED);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingLeassetsMessageToken() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsMessageTokenRepository.findAll().size();
+        leassetsMessageToken.setId(count.incrementAndGet());
+
+        // Create the LeassetsMessageToken
+        LeassetsMessageTokenDTO leassetsMessageTokenDTO = leassetsMessageTokenMapper.toDto(leassetsMessageToken);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restLeassetsMessageTokenMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, leassetsMessageTokenDTO.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeassetsMessageToken in the database
+        List<LeassetsMessageToken> leassetsMessageTokenList = leassetsMessageTokenRepository.findAll();
+        assertThat(leassetsMessageTokenList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsMessageToken in Elasticsearch
+        verify(mockLeassetsMessageTokenSearchRepository, times(0)).save(leassetsMessageToken);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchLeassetsMessageToken() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsMessageTokenRepository.findAll().size();
+        leassetsMessageToken.setId(count.incrementAndGet());
+
+        // Create the LeassetsMessageToken
+        LeassetsMessageTokenDTO leassetsMessageTokenDTO = leassetsMessageTokenMapper.toDto(leassetsMessageToken);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeassetsMessageTokenMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeassetsMessageToken in the database
+        List<LeassetsMessageToken> leassetsMessageTokenList = leassetsMessageTokenRepository.findAll();
+        assertThat(leassetsMessageTokenList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsMessageToken in Elasticsearch
+        verify(mockLeassetsMessageTokenSearchRepository, times(0)).save(leassetsMessageToken);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamLeassetsMessageToken() throws Exception {
+        int databaseSizeBeforeUpdate = leassetsMessageTokenRepository.findAll().size();
+        leassetsMessageToken.setId(count.incrementAndGet());
+
+        // Create the LeassetsMessageToken
+        LeassetsMessageTokenDTO leassetsMessageTokenDTO = leassetsMessageTokenMapper.toDto(leassetsMessageToken);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeassetsMessageTokenMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leassetsMessageTokenDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeassetsMessageToken in the database
+        List<LeassetsMessageToken> leassetsMessageTokenList = leassetsMessageTokenRepository.findAll();
+        assertThat(leassetsMessageTokenList).hasSize(databaseSizeBeforeUpdate);
+
+        // Validate the LeassetsMessageToken in Elasticsearch
+        verify(mockLeassetsMessageTokenSearchRepository, times(0)).save(leassetsMessageToken);
+    }
+
+    @Test
+    @Transactional
+    void deleteLeassetsMessageToken() throws Exception {
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
 
@@ -831,7 +1038,7 @@ public class LeassetsMessageTokenResourceIT {
 
         // Delete the leassetsMessageToken
         restLeassetsMessageTokenMockMvc
-            .perform(delete("/api/leassets-message-tokens/{id}", leassetsMessageToken.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, leassetsMessageToken.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
@@ -844,7 +1051,7 @@ public class LeassetsMessageTokenResourceIT {
 
     @Test
     @Transactional
-    public void searchLeassetsMessageToken() throws Exception {
+    void searchLeassetsMessageToken() throws Exception {
         // Configure the mock search repository
         // Initialize the database
         leassetsMessageTokenRepository.saveAndFlush(leassetsMessageToken);
@@ -853,7 +1060,7 @@ public class LeassetsMessageTokenResourceIT {
 
         // Search the leassetsMessageToken
         restLeassetsMessageTokenMockMvc
-            .perform(get("/api/_search/leassets-message-tokens?query=id:" + leassetsMessageToken.getId()))
+            .perform(get(ENTITY_SEARCH_API_URL + "?query=id:" + leassetsMessageToken.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leassetsMessageToken.getId().intValue())))

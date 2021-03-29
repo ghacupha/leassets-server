@@ -52,8 +52,13 @@ public class LeassetsMessageToken implements Serializable {
         this.id = id;
     }
 
+    public LeassetsMessageToken id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public LeassetsMessageToken description(String description) {
@@ -66,7 +71,7 @@ public class LeassetsMessageToken implements Serializable {
     }
 
     public Long getTimeSent() {
-        return timeSent;
+        return this.timeSent;
     }
 
     public LeassetsMessageToken timeSent(Long timeSent) {
@@ -79,7 +84,7 @@ public class LeassetsMessageToken implements Serializable {
     }
 
     public String getTokenValue() {
-        return tokenValue;
+        return this.tokenValue;
     }
 
     public LeassetsMessageToken tokenValue(String tokenValue) {
@@ -91,8 +96,8 @@ public class LeassetsMessageToken implements Serializable {
         this.tokenValue = tokenValue;
     }
 
-    public Boolean isReceived() {
-        return received;
+    public Boolean getReceived() {
+        return this.received;
     }
 
     public LeassetsMessageToken received(Boolean received) {
@@ -104,8 +109,8 @@ public class LeassetsMessageToken implements Serializable {
         this.received = received;
     }
 
-    public Boolean isActioned() {
-        return actioned;
+    public Boolean getActioned() {
+        return this.actioned;
     }
 
     public LeassetsMessageToken actioned(Boolean actioned) {
@@ -117,8 +122,8 @@ public class LeassetsMessageToken implements Serializable {
         this.actioned = actioned;
     }
 
-    public Boolean isContentFullyEnqueued() {
-        return contentFullyEnqueued;
+    public Boolean getContentFullyEnqueued() {
+        return this.contentFullyEnqueued;
     }
 
     public LeassetsMessageToken contentFullyEnqueued(Boolean contentFullyEnqueued) {
@@ -145,7 +150,8 @@ public class LeassetsMessageToken implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore
@@ -156,9 +162,9 @@ public class LeassetsMessageToken implements Serializable {
             ", description='" + getDescription() + "'" +
             ", timeSent=" + getTimeSent() +
             ", tokenValue='" + getTokenValue() + "'" +
-            ", received='" + isReceived() + "'" +
-            ", actioned='" + isActioned() + "'" +
-            ", contentFullyEnqueued='" + isContentFullyEnqueued() + "'" +
+            ", received='" + getReceived() + "'" +
+            ", actioned='" + getActioned() + "'" +
+            ", contentFullyEnqueued='" + getContentFullyEnqueued() + "'" +
             "}";
     }
 }

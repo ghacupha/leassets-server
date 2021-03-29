@@ -1,6 +1,9 @@
 package io.github.leassets.web.rest;
 
+import static org.elasticsearch.index.query.QueryBuilders.*;
+
 import io.github.leassets.domain.LeassetsFileType;
+import io.github.leassets.repository.LeassetsFileTypeRepository;
 import io.github.leassets.service.LeassetsFileTypeQueryService;
 import io.github.leassets.service.LeassetsFileTypeService;
 import io.github.leassets.service.criteria.LeassetsFileTypeCriteria;
@@ -8,14 +11,18 @@ import io.github.leassets.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -39,13 +46,17 @@ public class LeassetsFileTypeResource {
 
     private final LeassetsFileTypeService leassetsFileTypeService;
 
+    private final LeassetsFileTypeRepository leassetsFileTypeRepository;
+
     private final LeassetsFileTypeQueryService leassetsFileTypeQueryService;
 
     public LeassetsFileTypeResource(
         LeassetsFileTypeService leassetsFileTypeService,
+        LeassetsFileTypeRepository leassetsFileTypeRepository,
         LeassetsFileTypeQueryService leassetsFileTypeQueryService
     ) {
         this.leassetsFileTypeService = leassetsFileTypeService;
+        this.leassetsFileTypeRepository = leassetsFileTypeRepository;
         this.leassetsFileTypeQueryService = leassetsFileTypeQueryService;
     }
 
@@ -71,26 +82,73 @@ public class LeassetsFileTypeResource {
     }
 
     /**
-     * {@code PUT  /leassets-file-types} : Updates an existing leassetsFileType.
+     * {@code PUT  /leassets-file-types/:id} : Updates an existing leassetsFileType.
      *
+     * @param id the id of the leassetsFileType to save.
      * @param leassetsFileType the leassetsFileType to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated leassetsFileType,
      * or with status {@code 400 (Bad Request)} if the leassetsFileType is not valid,
      * or with status {@code 500 (Internal Server Error)} if the leassetsFileType couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/leassets-file-types")
-    public ResponseEntity<LeassetsFileType> updateLeassetsFileType(@Valid @RequestBody LeassetsFileType leassetsFileType)
-        throws URISyntaxException {
-        log.debug("REST request to update LeassetsFileType : {}", leassetsFileType);
+    @PutMapping("/leassets-file-types/{id}")
+    public ResponseEntity<LeassetsFileType> updateLeassetsFileType(
+        @PathVariable(value = "id", required = false) final Long id,
+        @Valid @RequestBody LeassetsFileType leassetsFileType
+    ) throws URISyntaxException {
+        log.debug("REST request to update LeassetsFileType : {}, {}", id, leassetsFileType);
         if (leassetsFileType.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        if (!Objects.equals(id, leassetsFileType.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!leassetsFileTypeRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
         LeassetsFileType result = leassetsFileTypeService.save(leassetsFileType);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, leassetsFileType.getId().toString()))
             .body(result);
+    }
+
+    /**
+     * {@code PATCH  /leassets-file-types/:id} : Partial updates given fields of an existing leassetsFileType, field will ignore if it is null
+     *
+     * @param id the id of the leassetsFileType to save.
+     * @param leassetsFileType the leassetsFileType to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated leassetsFileType,
+     * or with status {@code 400 (Bad Request)} if the leassetsFileType is not valid,
+     * or with status {@code 404 (Not Found)} if the leassetsFileType is not found,
+     * or with status {@code 500 (Internal Server Error)} if the leassetsFileType couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/leassets-file-types/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<LeassetsFileType> partialUpdateLeassetsFileType(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody LeassetsFileType leassetsFileType
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update LeassetsFileType partially : {}, {}", id, leassetsFileType);
+        if (leassetsFileType.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, leassetsFileType.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!leassetsFileTypeRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<LeassetsFileType> result = leassetsFileTypeService.partialUpdate(leassetsFileType);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, leassetsFileType.getId().toString())
+        );
     }
 
     /**

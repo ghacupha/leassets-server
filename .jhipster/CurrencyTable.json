@@ -4,11 +4,7 @@
     {
       "fieldName": "currencyCode",
       "fieldType": "String",
-      "fieldValidateRules": [
-        "unique",
-        "minlength",
-        "maxlength"
-      ],
+      "fieldValidateRules": ["unique", "minlength", "maxlength"],
       "fieldValidateRulesMinlength": "3",
       "fieldValidateRulesMaxlength": "3"
     },
@@ -16,9 +12,7 @@
       "fieldName": "locality",
       "fieldType": "CurrencyLocality",
       "fieldValues": "LOCAL,FOREIGN",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "currencyName",

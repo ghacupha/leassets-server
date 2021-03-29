@@ -89,11 +89,25 @@ public class LeassetsFileTypeCriteria implements Serializable, Criteria {
         return id;
     }
 
+    public LongFilter id() {
+        if (id == null) {
+            id = new LongFilter();
+        }
+        return id;
+    }
+
     public void setId(LongFilter id) {
         this.id = id;
     }
 
     public StringFilter getLeassetsFileTypeName() {
+        return leassetsFileTypeName;
+    }
+
+    public StringFilter leassetsFileTypeName() {
+        if (leassetsFileTypeName == null) {
+            leassetsFileTypeName = new StringFilter();
+        }
         return leassetsFileTypeName;
     }
 
@@ -105,6 +119,13 @@ public class LeassetsFileTypeCriteria implements Serializable, Criteria {
         return leassetsFileMediumType;
     }
 
+    public LeassetsFileMediumTypesFilter leassetsFileMediumType() {
+        if (leassetsFileMediumType == null) {
+            leassetsFileMediumType = new LeassetsFileMediumTypesFilter();
+        }
+        return leassetsFileMediumType;
+    }
+
     public void setLeassetsFileMediumType(LeassetsFileMediumTypesFilter leassetsFileMediumType) {
         this.leassetsFileMediumType = leassetsFileMediumType;
     }
@@ -113,11 +134,25 @@ public class LeassetsFileTypeCriteria implements Serializable, Criteria {
         return description;
     }
 
+    public StringFilter description() {
+        if (description == null) {
+            description = new StringFilter();
+        }
+        return description;
+    }
+
     public void setDescription(StringFilter description) {
         this.description = description;
     }
 
     public LeassetsFileModelTypeFilter getLeassetsfileType() {
+        return leassetsfileType;
+    }
+
+    public LeassetsFileModelTypeFilter leassetsfileType() {
+        if (leassetsfileType == null) {
+            leassetsfileType = new LeassetsFileModelTypeFilter();
+        }
         return leassetsfileType;
     }
 
@@ -152,11 +187,11 @@ public class LeassetsFileTypeCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "LeassetsFileTypeCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (leassetsFileTypeName != null ? "leassetsFileTypeName=" + leassetsFileTypeName + ", " : "") +
-                (leassetsFileMediumType != null ? "leassetsFileMediumType=" + leassetsFileMediumType + ", " : "") +
-                (description != null ? "description=" + description + ", " : "") +
-                (leassetsfileType != null ? "leassetsfileType=" + leassetsfileType + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (leassetsFileTypeName != null ? "leassetsFileTypeName=" + leassetsFileTypeName + ", " : "") +
+            (leassetsFileMediumType != null ? "leassetsFileMediumType=" + leassetsFileMediumType + ", " : "") +
+            (description != null ? "description=" + description + ", " : "") +
+            (leassetsfileType != null ? "leassetsfileType=" + leassetsfileType + ", " : "") +
             "}";
     }
 }

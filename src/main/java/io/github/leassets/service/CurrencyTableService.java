@@ -18,6 +18,14 @@ public interface CurrencyTableService {
     CurrencyTableDTO save(CurrencyTableDTO currencyTableDTO);
 
     /**
+     * Partially updates a currencyTable.
+     *
+     * @param currencyTableDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    Optional<CurrencyTableDTO> partialUpdate(CurrencyTableDTO currencyTableDTO);
+
+    /**
      * Get all the currencyTables.
      *
      * @param pageable the pagination information.

@@ -58,9 +58,9 @@ public class FileUploadResourceDecorator implements IFileUploadResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/file-uploads")
-    public ResponseEntity<LeassetsFileUploadDTO> updateFileUpload(@Valid @RequestBody LeassetsFileUploadDTO fileUploadDTO)
+    public ResponseEntity<LeassetsFileUploadDTO> updateFileUpload(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody LeassetsFileUploadDTO fileUploadDTO)
         throws URISyntaxException {
-        return fileUploadResource.updateLeassetsFileUpload(fileUploadDTO);
+        return fileUploadResource.updateLeassetsFileUpload(id, fileUploadDTO);
     }
 
     /**

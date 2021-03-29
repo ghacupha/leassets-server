@@ -1,5 +1,8 @@
 package io.github.leassets.web.rest;
 
+import static org.elasticsearch.index.query.QueryBuilders.*;
+
+import io.github.leassets.repository.CurrencyTableRepository;
 import io.github.leassets.service.CurrencyTableQueryService;
 import io.github.leassets.service.CurrencyTableService;
 import io.github.leassets.service.criteria.CurrencyTableCriteria;
@@ -8,14 +11,18 @@ import io.github.leassets.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -39,10 +46,17 @@ public class CurrencyTableResource {
 
     private final CurrencyTableService currencyTableService;
 
+    private final CurrencyTableRepository currencyTableRepository;
+
     private final CurrencyTableQueryService currencyTableQueryService;
 
-    public CurrencyTableResource(CurrencyTableService currencyTableService, CurrencyTableQueryService currencyTableQueryService) {
+    public CurrencyTableResource(
+        CurrencyTableService currencyTableService,
+        CurrencyTableRepository currencyTableRepository,
+        CurrencyTableQueryService currencyTableQueryService
+    ) {
         this.currencyTableService = currencyTableService;
+        this.currencyTableRepository = currencyTableRepository;
         this.currencyTableQueryService = currencyTableQueryService;
     }
 
@@ -68,26 +82,73 @@ public class CurrencyTableResource {
     }
 
     /**
-     * {@code PUT  /currency-tables} : Updates an existing currencyTable.
+     * {@code PUT  /currency-tables/:id} : Updates an existing currencyTable.
      *
+     * @param id the id of the currencyTableDTO to save.
      * @param currencyTableDTO the currencyTableDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated currencyTableDTO,
      * or with status {@code 400 (Bad Request)} if the currencyTableDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the currencyTableDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/currency-tables")
-    public ResponseEntity<CurrencyTableDTO> updateCurrencyTable(@Valid @RequestBody CurrencyTableDTO currencyTableDTO)
-        throws URISyntaxException {
-        log.debug("REST request to update CurrencyTable : {}", currencyTableDTO);
+    @PutMapping("/currency-tables/{id}")
+    public ResponseEntity<CurrencyTableDTO> updateCurrencyTable(
+        @PathVariable(value = "id", required = false) final Long id,
+        @Valid @RequestBody CurrencyTableDTO currencyTableDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to update CurrencyTable : {}, {}", id, currencyTableDTO);
         if (currencyTableDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        if (!Objects.equals(id, currencyTableDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!currencyTableRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
         CurrencyTableDTO result = currencyTableService.save(currencyTableDTO);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, currencyTableDTO.getId().toString()))
             .body(result);
+    }
+
+    /**
+     * {@code PATCH  /currency-tables/:id} : Partial updates given fields of an existing currencyTable, field will ignore if it is null
+     *
+     * @param id the id of the currencyTableDTO to save.
+     * @param currencyTableDTO the currencyTableDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated currencyTableDTO,
+     * or with status {@code 400 (Bad Request)} if the currencyTableDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the currencyTableDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the currencyTableDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/currency-tables/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<CurrencyTableDTO> partialUpdateCurrencyTable(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody CurrencyTableDTO currencyTableDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update CurrencyTable partially : {}, {}", id, currencyTableDTO);
+        if (currencyTableDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, currencyTableDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!currencyTableRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<CurrencyTableDTO> result = currencyTableService.partialUpdate(currencyTableDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, currencyTableDTO.getId().toString())
+        );
     }
 
     /**

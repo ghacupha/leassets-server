@@ -48,8 +48,13 @@ public class CurrencyTable implements Serializable {
         this.id = id;
     }
 
+    public CurrencyTable id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getCurrencyCode() {
-        return currencyCode;
+        return this.currencyCode;
     }
 
     public CurrencyTable currencyCode(String currencyCode) {
@@ -62,7 +67,7 @@ public class CurrencyTable implements Serializable {
     }
 
     public CurrencyLocality getLocality() {
-        return locality;
+        return this.locality;
     }
 
     public CurrencyTable locality(CurrencyLocality locality) {
@@ -75,7 +80,7 @@ public class CurrencyTable implements Serializable {
     }
 
     public String getCurrencyName() {
-        return currencyName;
+        return this.currencyName;
     }
 
     public CurrencyTable currencyName(String currencyName) {
@@ -88,7 +93,7 @@ public class CurrencyTable implements Serializable {
     }
 
     public String getCountry() {
-        return country;
+        return this.country;
     }
 
     public CurrencyTable country(String country) {
@@ -115,7 +120,8 @@ public class CurrencyTable implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

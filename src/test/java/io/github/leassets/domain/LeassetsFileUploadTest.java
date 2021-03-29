@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.leassets.web.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 
-public class LeassetsFileUploadTest {
+class LeassetsFileUploadTest {
 
     @Test
-    public void equalsVerifier() throws Exception {
+    void equalsVerifier() throws Exception {
         TestUtil.equalsVerifier(LeassetsFileUpload.class);
         LeassetsFileUpload leassetsFileUpload1 = new LeassetsFileUpload();
         leassetsFileUpload1.setId(1L);
