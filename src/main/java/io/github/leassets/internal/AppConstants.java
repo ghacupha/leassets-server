@@ -21,5 +21,8 @@ public class AppConstants {
     public static final int LIST_PAGE_SIZE = 5000;
     public static final int LIST_PAGE_SIZE_TABLES = 5;
 
+    public static final String STRAIGHT_LINE_BASIS_DEPRECIATION_ID= "STRAIGHT LINE BASIS";
+    public static final String DECLINING_BALANCE_BASIS_DEPRECIATION_ID= "DECLINING BALANCE BASIS";
+
     private AppConstants() {}
 }
