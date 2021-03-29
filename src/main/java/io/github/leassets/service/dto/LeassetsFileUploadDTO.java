@@ -1,5 +1,7 @@
 package io.github.leassets.service.dto;
 
+import io.github.leassets.internal.batch.framework.HasDataFile;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -9,7 +11,7 @@ import javax.validation.constraints.*;
 /**
  * A DTO for the {@link io.github.leassets.domain.LeassetsFileUpload} entity.
  */
-public class LeassetsFileUploadDTO implements Serializable {
+public class LeassetsFileUploadDTO implements Serializable, HasDataFile {
 
     private Long id;
 
