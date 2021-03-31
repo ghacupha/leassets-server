@@ -1,6 +1,8 @@
 package io.github.leassets.internal;
 
 import com.google.common.collect.ImmutableList;
+import io.github.leassets.internal.batch.framework.HasUploadToken;
+
 import java.util.List;
 
 /**
@@ -19,7 +21,7 @@ public interface Mapping<V1, V2> {
         return vs.stream().map(this::toValue1).collect(ImmutableList.toImmutableList());
     }
 
-    default List<V2> toValue2(List<V1> vs) {
+    default List<V2> toValue2(List<? extends V1> vs) {
         return vs.stream().map(this::toValue2).collect(ImmutableList.toImmutableList());
     }
 }

@@ -29,7 +29,7 @@ public class EntityItemsReader<F, EVM> implements ItemReader<List<EVM>> {
 
     private ListPartition<EVM> evmListPartition;
 
-    EntityItemsReader(
+    public EntityItemsReader(
         final ExcelFileDeserializer<EVM> deserializer,
         final DataFileUploadService<F> fileUploadService,
         @Value("#{jobParameters['fileId']}") long fileId,
