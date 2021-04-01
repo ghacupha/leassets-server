@@ -10,7 +10,7 @@ import java.util.StringJoiner;
 /**
  * Excel view model for the fixed-asset-acquisition entity
  */
-public class FixedAssetAcquisitionEVM implements Serializable {
+public class FixedAssetAcquisitionEVM implements ExcelViewModel {
 
     @ExcelRow
     private Long rowIndex;
@@ -51,6 +51,11 @@ public class FixedAssetAcquisitionEVM implements Serializable {
         this.assetCategory = assetCategory;
         this.purchasePrice = purchasePrice;
         this.fileUploadToken = fileUploadToken;
+    }
+
+    @Override
+    public Object getModelData() {
+        return this;
     }
 
     public Long getRowIndex() {

@@ -59,6 +59,11 @@ public class FixedAssetAcquisitionCriteria implements Serializable, Criteria {
     }
 
     @Override
+    public HasTokenizedCriteria<FixedAssetAcquisitionCriteria> getInstance() {
+        return this;
+    }
+
+    @Override
     public FixedAssetAcquisitionCriteria copy() {
         return new FixedAssetAcquisitionCriteria(this);
     }
