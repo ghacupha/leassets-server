@@ -1,5 +1,6 @@
 package io.github.leassets.service;
 
+import io.github.leassets.internal.batch.framework.DataFileUploadService;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -8,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 /**
  * Service Interface for managing {@link io.github.leassets.domain.LeassetsFileUpload}.
  */
-public interface LeassetsFileUploadService {
+public interface LeassetsFileUploadService extends DataFileUploadService<LeassetsFileUploadDTO> {
     /**
      * Save a leassetsFileUpload.
      *

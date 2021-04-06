@@ -1,9 +1,12 @@
-package io.github.leassets.internal.batch.fixedAssetAcquisition;
+package io.github.leassets.internal.batch.framework;
 
 import io.github.leassets.config.FileUploadsProperties;
-import io.github.leassets.internal.batch.ListPartition;
 import io.github.leassets.internal.service.FileUploadTokenService;
-import io.github.leassets.service.LeassetsFileUploadService;
+import io.github.leassets.service.dto.LeassetsFileUploadDTO;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemReader;
@@ -12,26 +15,26 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
+/**
+ * This is a short-term attempt at creating an abstract items-deletion-reader
+ */
+public class EntityItemsDeletionReader implements ItemReader<List<Long>> {
 
-public class EntityItemsDeletionReader<DTO> implements ItemReader<List<Long>> {
+    private static final Logger log = LoggerFactory.getLogger(EntityItemsDeletionReader.class);
     private final long fileId;
 
-    private final GranularFileUploadService fileUploadService;
+    private final DataFileUploadService<LeassetsFileUploadDTO> fileUploadService;
     private final FileUploadsProperties fileUploadsProperties;
-    private final FileUploadTokenService<BankGuaranteeDTO> fileUploadTokenService;
+    private final FileUploadTokenService<? extends HasIndex> fileUploadTokenService;
 
     // TODO Initialize later, not in the constructor
     private ListPartition<Long> listPartition;
 
-    public BankGuaranteeDeleteItemsReader(
+    public EntityItemsDeletionReader(
         final @Value("#{jobParameters['fileId']}") long fileId,
-        final GranularFileUploadService fileUploadService,
+        final DataFileUploadService<LeassetsFileUploadDTO> fileUploadService,
         final FileUploadsProperties fileUploadsProperties,
-        final FileUploadTokenService<BankGuaranteeDTO> fileUploadTokenService
+        final FileUploadTokenService<? extends HasIndex> fileUploadTokenService
     ) {
         this.fileId = fileId;
         this.fileUploadService = fileUploadService;
@@ -54,14 +57,14 @@ public class EntityItemsDeletionReader<DTO> implements ItemReader<List<Long>> {
                         .ifPresent(
                             entities -> {
                                 // TODO pass actual entities for deletion
-                                unProcessedItems.addAll(entities.stream().map(BankGuaranteeDTO::getId).collect(Collectors.toList()));
+                                unProcessedItems.addAll(entities.stream().map(HasIndex::getId).collect(Collectors.toList()));
                             }
                         );
                 }
             );
 
         // Going for a big chunk due to expected file size
-        listPartition = new ListPartition<>(fileUploadsProperties.getLargeUploads(), unProcessedItems);
+        listPartition = new ListPartition<>(fileUploadsProperties.getListSize(), unProcessedItems);
 
         log.info("List items realized : {}", unProcessedItems.size());
     }

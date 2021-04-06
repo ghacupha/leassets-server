@@ -1,5 +1,6 @@
 package io.github.leassets.service.dto;
 
+import io.github.leassets.internal.batch.framework.HasIndex;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,7 +10,7 @@ import javax.validation.constraints.*;
 /**
  * A DTO for the {@link io.github.leassets.domain.FixedAssetAcquisition} entity.
  */
-public class FixedAssetAcquisitionDTO implements Serializable {
+public class FixedAssetAcquisitionDTO implements Serializable, HasIndex {
 
     private Long id;
 

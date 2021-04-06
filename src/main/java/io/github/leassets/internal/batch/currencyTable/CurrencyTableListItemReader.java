@@ -1,7 +1,7 @@
 package io.github.leassets.internal.batch.currencyTable;
 
 import io.github.leassets.config.FileUploadsProperties;
-import io.github.leassets.internal.batch.ListPartition;
+import io.github.leassets.internal.batch.framework.ListPartition;
 import io.github.leassets.internal.excel.ExcelFileDeserializer;
 import io.github.leassets.internal.model.sampleDataModel.CurrencyTableEVM;
 import io.github.leassets.service.LeassetsFileUploadService;

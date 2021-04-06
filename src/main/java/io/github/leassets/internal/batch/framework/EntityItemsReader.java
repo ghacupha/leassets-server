@@ -1,16 +1,14 @@
 package io.github.leassets.internal.batch.framework;
 
 import io.github.leassets.config.FileUploadsProperties;
-import io.github.leassets.internal.batch.ListPartition;
 import io.github.leassets.internal.excel.ExcelFileDeserializer;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
-
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -45,9 +43,13 @@ public class EntityItemsReader<F, EVM> implements ItemReader<List<EVM>> {
     private void resetIndex() {
         final List<EVM> unProcessedItems = new ArrayList<>();
 
-        fileUploadService.findOne(fileId).ifPresent(fileUpload -> {
-            unProcessedItems.addAll(deserializer.deserialize(fileUpload.getDataFile()));
-        });
+        fileUploadService
+            .findOne(fileId)
+            .ifPresent(
+                fileUpload -> {
+                    unProcessedItems.addAll(deserializer.deserialize(fileUpload.getDataFile()));
+                }
+            );
 
         // Going for a big chunk due to expected file size
         evmListPartition = new ListPartition<>(fileUploadsProperties.getListSize(), unProcessedItems);

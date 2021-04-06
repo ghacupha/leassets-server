@@ -1,5 +1,6 @@
-package io.github.leassets.internal.batch;
+package io.github.leassets.internal.batch.framework;
 
+import io.github.leassets.internal.batch.PersistenceJobListener;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobScope;
