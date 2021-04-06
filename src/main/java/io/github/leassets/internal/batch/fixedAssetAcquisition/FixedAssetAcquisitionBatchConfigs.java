@@ -1,5 +1,6 @@
 package io.github.leassets.internal.batch.fixedAssetAcquisition;
 
+import com.google.common.collect.ImmutableList;
 import io.github.leassets.config.FileUploadsProperties;
 import io.github.leassets.domain.FixedAssetAcquisition;
 import io.github.leassets.internal.Mapping;
@@ -16,7 +17,6 @@ import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
 import io.github.leassets.internal.service.BatchService;
 import io.github.leassets.internal.service.DeletionService;
 import io.github.leassets.internal.service.FileUploadTokenService;
-import io.github.leassets.service.LeassetsFileUploadService;
 import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import java.util.List;
@@ -35,6 +35,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * This java-based configuration has been designed to be as general as possible with all
+ * static string names placed at the top. This is to facilitate reuse for other entities.
+ * Where it's not possible to create an abstract configuration at lease this class
+ * can be considered a well done template for the others to adhere to.
+ */
 @Configuration
 public class FixedAssetAcquisitionBatchConfigs {
 
@@ -45,6 +51,9 @@ public class FixedAssetAcquisitionBatchConfigs {
     private static final String DELETION_PROCESSOR_NAME = "fixedAssetAcquisitionDeletionProcessor";
     private static final String DELETION_WRITER_NAME = "fixedAssetAcquisitionDeletionWriter";
     private static final String DELETION_READER_NAME = "fixedAssetsAcquisitionDeletionReader";
+    private static final String PERSISTENCE_READER_NAME = "fixedAssetAcquisitionListItemReader";
+    private static final String PERSISTENCE_PROCESSOR_NAME = "fixedAssetsAcquisitionListItemProcessor";
+    private static final String PERSISTENCE_WRITER_NAME = "fixedAssetAcquisitionEntityListItemsWriter";
 
     @Value("#{jobParameters['fileId']}")
     private static long fileId;
@@ -86,25 +95,27 @@ public class FixedAssetAcquisitionBatchConfigs {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
-    @Bean
+    @Bean(PERSISTENCE_READER_NAME)
     @JobScope
-    public EntityItemsReader<LeassetsFileUploadDTO, FixedAssetAcquisitionEVM> fixedAssetAcquisitionListItemReader(
+    public EntityItemsReader<LeassetsFileUploadDTO, FixedAssetAcquisitionEVM> listItemReader(
         @Value("#{jobParameters['fileId']}") long fileId
     ) {
         return new EntityItemsReader<>(fixedAssetAcquisitionDeserializer, fileUploadService, fileId, fileUploadsProperties);
     }
 
-    @Bean
+    @Bean(PERSISTENCE_PROCESSOR_NAME)
     @JobScope
-    public ItemProcessor<List<FixedAssetAcquisitionEVM>, List<FixedAssetAcquisitionDTO>> fixedAssetsAcquisitionListItemsProcessor(
+    public ItemProcessor<List<FixedAssetAcquisitionEVM>, List<FixedAssetAcquisitionDTO>> listItemsProcessor(
         @Value("#{jobParameters['messageToken']}") String jobUploadToken
     ) {
-        return new FixedAssetAcquisitionListItemProcessor(mapping, jobUploadToken);
+        //        return new FixedAssetAcquisitionListItemProcessor(mapping, jobUploadToken);
+        return evms ->
+            evms.stream().map(mapping::toValue2).peek(d -> d.setFileUploadToken(jobUploadToken)).collect(ImmutableList.toImmutableList());
     }
 
-    @Bean
+    @Bean(PERSISTENCE_WRITER_NAME)
     @JobScope
-    public EntityListItemsWriter<FixedAssetAcquisitionDTO> fixedAssetAcquisitionEntityListItemsWriter() {
+    public EntityListItemsWriter<FixedAssetAcquisitionDTO> listItemsWriter() {
         return new EntityListItemsWriter<>(batchService);
     }
 
@@ -112,9 +123,9 @@ public class FixedAssetAcquisitionBatchConfigs {
     public Step readFile() {
         return new ReadFileStep<>(
             READ_FILE_STEP_NAME,
-            fixedAssetAcquisitionListItemReader(fileId),
-            fixedAssetsAcquisitionListItemsProcessor(jobUploadToken),
-            fixedAssetAcquisitionEntityListItemsWriter(),
+            listItemReader(fileId),
+            listItemsProcessor(jobUploadToken),
+            listItemsWriter(),
             stepBuilderFactory
         );
     }
