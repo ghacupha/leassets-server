@@ -1,10 +1,13 @@
 package io.github.leassets.internal.excel;
 
+import static io.github.leassets.internal.AppConstants.DATETIME_FORMATTER;
 import static io.github.leassets.internal.excel.ExcelTestUtil.readFile;
 import static io.github.leassets.internal.excel.ExcelTestUtil.toBytes;
+import static java.time.LocalDate.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
 import io.github.leassets.internal.model.sampleDataModel.CurrencyTableEVM;
 import java.io.IOException;
 import java.util.List;
@@ -107,5 +110,32 @@ public class ExcelFileUtilsTest {
                     .locality("FOREIGN")
                     .build()
             );
+    }
+
+    @Test
+    public void fixedAssetAcquisitionFile() throws Exception {
+        ExcelFileDeserializer<FixedAssetAcquisitionEVM> deserializer = container.fixedAssetAcquisitionExcelFileDeserializer();
+
+        List<FixedAssetAcquisitionEVM> evms = deserializer.deserialize(toBytes(readFile("assetAcquisitionList.xlsx")));
+
+        assertThat(evms.size()).isEqualTo(13);
+
+        for (int i = 0; i < 13; i++) {
+            String index = String.valueOf(i + 1);
+            assertThat(evms.get(i))
+                .isEqualTo(
+                    FixedAssetAcquisitionEVM
+                        .builder()
+                        .rowIndex((long) (i + 1))
+                        .assetNumber((long) (i + 1))
+                        .serviceOutletCode("SOL_ID " + index)
+                        .assetTag("ASSET_TAG " + index)
+                        .assetDescription("ASSET_DESCRIPTION " + index)
+                        .purchaseDate(DATETIME_FORMATTER.format(of(2021, 1, 1).plusDays(Long.parseLong(index)).minusDays(1l)))
+                        .assetCategory("ASSET_CATEGORY " + index)
+                        .purchasePrice(1.1 + i)
+                        .build()
+                );
+        }
     }
 }
