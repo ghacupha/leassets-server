@@ -58,10 +58,10 @@ public class FixedAssetAcquisitionCriteria implements Serializable, Criteria {
         this.fileUploadToken = other.fileUploadToken == null ? null : other.fileUploadToken.copy();
     }
 
-    @Override
-    public HasTokenizedCriteria<FixedAssetAcquisitionCriteria> getInstance() {
-        return this;
-    }
+    //    @Override
+    //    public HasTokenizedCriteria<FixedAssetAcquisitionCriteria> getInstance() {
+    //        return this;
+    //    }
 
     @Override
     public FixedAssetAcquisitionCriteria copy() {

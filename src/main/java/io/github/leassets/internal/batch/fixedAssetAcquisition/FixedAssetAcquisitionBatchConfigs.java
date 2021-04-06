@@ -71,6 +71,7 @@ public class FixedAssetAcquisitionBatchConfigs {
     @Autowired
     private BatchService<FixedAssetAcquisitionDTO> batchService;
 
+    @Autowired
     private DeletionService<FixedAssetAcquisition> fixedAssetAcquisitionDeletionService;
 
     @Autowired

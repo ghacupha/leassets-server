@@ -1,28 +1,28 @@
 package io.github.leassets.internal.service;
 
-import io.github.leassets.service.EntityQueryService;
+import io.github.leassets.service.FixedAssetAcquisitionQueryService;
 import io.github.leassets.service.criteria.FixedAssetAcquisitionCriteria;
-import tech.jhipster.service.filter.StringFilter;
-
+import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
+import tech.jhipster.service.filter.StringFilter;
 
-public class FixedAssetAcquisitionFileUploadTokenService<DTO, Criteria, Entity> implements FileUploadTokenService<DTO>  {
+@Service("fixedAssetAcquisitionFileUploadTokenService")
+public class FixedAssetAcquisitionFileUploadTokenService implements FileUploadTokenService<FixedAssetAcquisitionDTO> {
 
-    private final EntityQueryService<DTO, Criteria, Entity> bankGuaranteeQueryService;
-    private final HasTokenizedCriteria hasCriteriaInstance;
+    private final FixedAssetAcquisitionQueryService fixedAssetAcquisitionQueryService;
 
-    public FixedAssetAcquisitionFileUploadTokenService(final EntityQueryService<DTO, Criteria, Entity> bankGuaranteeQueryService, HasTokenizedCriteria hasCriteriaInstance) {
-        this.bankGuaranteeQueryService = bankGuaranteeQueryService;
-        this.hasCriteriaInstance = hasCriteriaInstance;
+    public FixedAssetAcquisitionFileUploadTokenService(final FixedAssetAcquisitionQueryService fixedAssetAcquisitionQueryService) {
+        this.fixedAssetAcquisitionQueryService = fixedAssetAcquisitionQueryService;
     }
 
     @Override
-    public Optional<List<DTO>> findAllByUploadToken(final String messageToken) {
+    public Optional<List<FixedAssetAcquisitionDTO>> findAllByUploadToken(final String messageToken) {
         FixedAssetAcquisitionCriteria criteria = new FixedAssetAcquisitionCriteria();
         StringFilter uploadToken = new StringFilter();
         uploadToken.setEquals(messageToken);
-        this.hasCriteriaInstance.setFileUploadToken(uploadToken);
-        return Optional.of(bankGuaranteeQueryService.findByCriteria(hasCriteriaInstance));
+        criteria.setFileUploadToken(uploadToken);
+        return Optional.of(fixedAssetAcquisitionQueryService.findByCriteria(criteria));
     }
 }
