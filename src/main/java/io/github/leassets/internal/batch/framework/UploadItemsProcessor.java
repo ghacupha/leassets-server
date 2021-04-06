@@ -3,9 +3,8 @@ package io.github.leassets.internal.batch.framework;
 import com.google.common.collect.ImmutableList;
 import io.github.leassets.internal.Mapping;
 import io.github.leassets.internal.model.ExcelViewModel;
-import org.springframework.batch.item.ItemProcessor;
-
 import java.util.List;
+import org.springframework.batch.item.ItemProcessor;
 
 /**
  * This object maps the excel-view-model to the equivalent DTO and add a jobUploadToken to the newly mapped
@@ -19,16 +18,18 @@ public class UploadItemsProcessor<T, D> implements ItemProcessor<List<? extends 
     private final Mapping<T, ? extends HasUploadToken<D>> mapping;
     private final String jobUploadToken;
 
-    public UploadItemsProcessor(
-        final Mapping<T, ? extends HasUploadToken<D>> mapping,
-        final String jobUploadToken
-    ) {
+    public UploadItemsProcessor(final Mapping<T, ? extends HasUploadToken<D>> mapping, final String jobUploadToken) {
         this.mapping = mapping;
         this.jobUploadToken = jobUploadToken;
     }
 
     @Override
     public List<? extends HasUploadToken<D>> process(final List<? extends ExcelViewModel<T>> evms) throws Exception {
-        return evms.stream().map(ExcelViewModel::getModelData).map(mapping::toValue2).peek(dto -> dto.setFileUploadToken(jobUploadToken)).collect(ImmutableList.toImmutableList());
+        return evms
+            .stream()
+            .map(ExcelViewModel::getModelData)
+            .map(mapping::toValue2)
+            .peek(dto -> dto.setUploadToken(jobUploadToken))
+            .collect(ImmutableList.toImmutableList());
     }
 }

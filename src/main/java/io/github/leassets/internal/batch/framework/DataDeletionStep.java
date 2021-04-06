@@ -10,7 +10,9 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Abstract data deletion step
+ * Abstract data deletion step. It uses the step-builder-factory to create a step whose
+ * configuration generates a {@link List} of Long items which mark the indices of instances
+ * of Entity E to be deleted from the persistence layer.
  *
  * @param <E> Entity whose table is to be deleted
  */

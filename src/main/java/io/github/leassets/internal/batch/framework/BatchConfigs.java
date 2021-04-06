@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Contains general configurations for batch related entities and objects
+ *
+ * This configuration also comes with the global activation of batch processes, as in
+ * {@link EnableBatchProcessing}, annotation
  */
 @Configuration
 @EnableBatchProcessing

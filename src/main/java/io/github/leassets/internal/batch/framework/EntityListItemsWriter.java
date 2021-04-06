@@ -1,12 +1,12 @@
 package io.github.leassets.internal.batch.framework;
 
 import io.github.leassets.internal.service.BatchService;
+import java.util.List;
 import org.springframework.batch.item.ItemWriter;
 
-import java.util.List;
-
 /**
- * Performs persistence of the newly created entities
+ * Performs persistence of the newly created entities through the batch-service
+ *
  * @param <DTO>
  */
 public class EntityListItemsWriter<DTO> implements ItemWriter<List<DTO>> {
@@ -19,7 +19,6 @@ public class EntityListItemsWriter<DTO> implements ItemWriter<List<DTO>> {
 
     @Override
     public void write(List<? extends List<DTO>> items) throws Exception {
-
         items.stream().peek(batchService::save).forEach(batchService::index);
     }
 }

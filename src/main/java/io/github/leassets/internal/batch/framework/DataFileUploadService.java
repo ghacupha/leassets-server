@@ -1,16 +1,16 @@
 package io.github.leassets.internal.batch.framework;
 
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
-
 /**
+ * This is a marker interface whose client manages persistence for the file-upload in the
+ * system
  *
  * @param <T> Type of file-upload data transfer object
  */
 public interface DataFileUploadService<T> {
-
     /**
      * Save a fileUpload.
      *

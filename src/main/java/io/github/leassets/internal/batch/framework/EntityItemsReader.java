@@ -11,6 +11,8 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
+ * Abstract implementation for reading data from an excel data file and then introducing the
+ * same data into the batch process in small chunks of pre-configured chunks
  *
  * @param <F> Type of file-upload data transfer object
  * @param <EVM> Type of object represented in a row of the file in the data transfer object

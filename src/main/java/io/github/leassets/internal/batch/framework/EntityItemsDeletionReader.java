@@ -16,7 +16,10 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
- * This is a short-term attempt at creating an abstract items-deletion-reader
+ * This is a short-term attempt at creating an abstract items-deletion-reader. The deletion
+ * procedure is of a particular consequence that effects deletion of data originated from
+ * a given data file,  given that the data has been marked with the same unique file-upload-token
+ * of the file-upload entity's instance
  */
 public class EntityItemsDeletionReader implements ItemReader<List<Long>> {
 

@@ -1,11 +1,13 @@
 package io.github.leassets.internal.batch.framework;
 
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
-
 /**
+ * This is an abstract implementation for the data-file-upload-service. The implementation
+ * does not do much as most of the implementation detail is actually handled by the client. The
+ * class provides uniformity in persistence procedures
  *
  * @param <F> File Upload Class
  */
@@ -33,7 +35,6 @@ public abstract class DefaultFileUploadImplementation<F> implements DataFileUplo
 
     @Override
     public void delete(Long id) {
-
         getFileUploadService().delete(id);
     }
 
