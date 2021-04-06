@@ -4,13 +4,9 @@ import io.github.leassets.domain.FixedAssetAcquisition;
 import io.github.leassets.domain.FixedAssetDepreciation;
 import io.github.leassets.domain.FixedAssetNetBookValue;
 import io.github.leassets.internal.model.FixedAssetAcquisitionEntityRepository;
-import io.github.leassets.internal.model.FixedAssetAcquisitionEntitySearchRepository;
 import io.github.leassets.internal.model.FixedAssetDepreciationEntityRepository;
-import io.github.leassets.internal.model.FixedAssetDepreciationEntitySearchRepository;
 import io.github.leassets.internal.model.FixedAssetNetBookValueEntityRepository;
-import io.github.leassets.internal.model.FixedAssetNetBookValueEntitySearchRepository;
 import io.github.leassets.internal.model.framework.DefaultBatchService;
-import io.github.leassets.internal.service.BatchService;
 import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
 import io.github.leassets.service.dto.FixedAssetDepreciationDTO;
 import io.github.leassets.service.dto.FixedAssetNetBookValueDTO;
@@ -33,16 +29,10 @@ public class BatchServicesContainer {
     private FixedAssetAcquisitionEntityRepository fixedAssetAcquisitionRepository;
 
     @Autowired
-    private FixedAssetAcquisitionEntitySearchRepository fixedAssetAcquisitionSearchRepository;
-
-    @Autowired
     private FixedAssetDepreciationMapper fixedAssetDepreciationMapper;
 
     @Autowired
     private FixedAssetDepreciationEntityRepository fixedAssetDepreciationRepository;
-
-    @Autowired
-    private FixedAssetDepreciationEntitySearchRepository fixedAssetDepreciationSearchRepository;
 
     @Autowired
     private FixedAssetNetBookValueMapper fixedAssetNetBookValueMapper;
@@ -50,36 +40,27 @@ public class BatchServicesContainer {
     @Autowired
     private FixedAssetNetBookValueEntityRepository fixedAssetNetBookValueRepository;
 
-    @Autowired
-    private FixedAssetNetBookValueEntitySearchRepository fixedAssetNetBookValueSearchRepository;
-
     @Bean("fixedAssetAcquisitionBatchService")
     public BatchService<FixedAssetAcquisitionDTO> fixedAssetAcquisitionBatchService() {
-
         return new DefaultBatchService<FixedAssetAcquisitionDTO, FixedAssetAcquisition>(
             fixedAssetAcquisitionMapper,
-            fixedAssetAcquisitionRepository,
-            fixedAssetAcquisitionSearchRepository
+            fixedAssetAcquisitionRepository
         );
     }
 
     @Bean("fixedAssetDepreciationBatchService")
     public BatchService<FixedAssetDepreciationDTO> fixedAssetDepreciationBatchService() {
-
         return new DefaultBatchService<FixedAssetDepreciationDTO, FixedAssetDepreciation>(
             fixedAssetDepreciationMapper,
-            fixedAssetDepreciationRepository,
-            fixedAssetDepreciationSearchRepository
+            fixedAssetDepreciationRepository
         );
     }
 
     @Bean("fixedAssetNetBookValueBatchService")
     public BatchService<FixedAssetNetBookValueDTO> fixedAssetNetBookValueBatchService() {
-
         return new DefaultBatchService<FixedAssetNetBookValueDTO, FixedAssetNetBookValue>(
             fixedAssetNetBookValueMapper,
-            fixedAssetNetBookValueRepository,
-            fixedAssetNetBookValueSearchRepository
+            fixedAssetNetBookValueRepository
         );
     }
 }

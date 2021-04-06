@@ -12,11 +12,10 @@ public interface HasUploadToken<D> {
     void setUploadToken(String uploadToken);
 
     String getUploadToken();
-
-    /**
-     * Simply returns the client's instance
-     *
-     * @return
-     */
-    D getChild();
+    //    /**
+    //     * Simply returns the client's instance
+    //     *
+    //     * @return
+    //     */
+    //    D getChild();
 }

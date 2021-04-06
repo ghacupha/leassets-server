@@ -37,15 +37,15 @@ public class LeassetsFileUploadDTO implements Serializable, HasDataFile<Leassets
 
     private String uploadToken;
 
-    /**
-     * Simply returns the client's instance
-     *
-     * @return
-     */
-    @Override
-    public LeassetsFileUploadDTO getChild() {
-        return this;
-    }
+    //    /**
+    //     * Simply returns the client's instance
+    //     *
+    //     * @return
+    //     */
+    //    @Override
+    //    public LeassetsFileUploadDTO getChild() {
+    //        return this;
+    //    }
 
     public Long getId() {
         return id;

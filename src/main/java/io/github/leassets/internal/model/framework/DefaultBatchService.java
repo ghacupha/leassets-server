@@ -2,7 +2,6 @@ package io.github.leassets.internal.model.framework;
 
 import io.github.leassets.internal.service.BatchService;
 import io.github.leassets.service.mapper.EntityMapper;
-
 import java.util.List;
 
 /**
@@ -21,13 +20,9 @@ public class DefaultBatchService<T, D> implements BatchService<T> {
     // Domain repository
     private final EntityRepository<D> repository;
 
-    // Search repository
-    private final EntitySearchRepository<D> searchRepository;
-
-    public DefaultBatchService(EntityMapper<T, D> entityMapper, EntityRepository<D> repository, EntitySearchRepository<D> searchRepository) {
+    public DefaultBatchService(EntityMapper<T, D> entityMapper, EntityRepository<D> repository) {
         this.entityMapper = entityMapper;
         this.repository = repository;
-        this.searchRepository = searchRepository;
     }
 
     @Override
@@ -37,6 +32,6 @@ public class DefaultBatchService<T, D> implements BatchService<T> {
 
     @Override
     public void index(List<T> entities) {
-        searchRepository.saveAll(entityMapper.toEntity(entities));
+        repository.indexAll(entityMapper.toEntity(entities));
     }
 }
