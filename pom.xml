@@ -49,6 +49,7 @@
 
         <!-- Dependency versions -->
         <jhipster-dependencies.version>7.0.0</jhipster-dependencies.version>
+        <spring-boot-start-batch.version>2.3.3.RELEASE</spring-boot-start-batch.version>
         <!-- The spring-boot version should match the one managed by
         https://mvnrepository.com/artifact/tech.jhipster/jhipster-dependencies/${jhipster-dependencies.version} -->
         <spring-boot.version>2.4.4</spring-boot.version>
@@ -363,9 +364,11 @@
             <artifactId>poiji</artifactId>
             <version>1.20.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-batch -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-batch</artifactId>
+            <version>${spring-boot-start-batch.version}</version>
         </dependency>
         <!-- jhipster-needle-maven-add-dependency -->
     </dependencies>
@@ -550,7 +553,6 @@
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
                                 <version>${lombok.version}</version>
-                                <scope>provided</scope>
                             </path>
                             <!-- jhipster-needle-maven-add-annotation-processor -->
                         </annotationProcessorPaths>

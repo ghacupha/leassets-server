@@ -1,6 +1,8 @@
 package io.github.leassets.internal.batch.framework;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -18,7 +20,10 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class DataDeletionStep<E> implements Step {
 
+    private static final Logger log = LoggerFactory.getLogger(DataDeletionStep.class);
+
     private final Step step;
+    private final String stepName;
 
     public DataDeletionStep(
         final StepBuilderFactory stepBuilderFactory,
@@ -35,10 +40,12 @@ public class DataDeletionStep<E> implements Step {
                 .processor(longListProcessor)
                 .writer(entityListWriter)
                 .build();
+        this.stepName = stepName;
     }
 
     @Override
     public String getName() {
+        log.debug("Creating batch step id : {} ...", stepName);
         return step.getName();
     }
 
@@ -54,6 +61,7 @@ public class DataDeletionStep<E> implements Step {
 
     @Override
     public void execute(StepExecution stepExecution) throws JobInterruptedException {
+        log.debug("Commencing execution of batch step id : {}", stepName);
         step.execute(stepExecution);
     }
 }
