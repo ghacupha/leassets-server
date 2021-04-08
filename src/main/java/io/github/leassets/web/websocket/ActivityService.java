@@ -17,6 +17,7 @@ package io.github.leassets.web.websocket;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import static io.github.leassets.config.WebsocketConfiguration.IP_ADDRESS;
 
 import io.github.leassets.web.websocket.dto.ActivityDTO;

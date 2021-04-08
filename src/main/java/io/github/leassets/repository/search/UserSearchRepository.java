@@ -17,6 +17,7 @@ package io.github.leassets.repository.search;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import io.github.leassets.domain.User;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 

@@ -1,5 +1,23 @@
 package io.github.leassets.internal.service;
 
+/*-
+ * Leassets Server - Leases and assets management platform
+ * Copyright © 2021 Edwin Njeru (mailnjeru@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import io.github.leassets.domain.FixedAssetAcquisition;
 import io.github.leassets.repository.FixedAssetAcquisitionRepository;
 import io.github.leassets.repository.search.FixedAssetAcquisitionSearchRepository;
@@ -7,19 +25,19 @@ import io.github.leassets.service.FixedAssetAcquisitionQueryService;
 import io.github.leassets.service.criteria.FixedAssetAcquisitionCriteria;
 import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
 import io.github.leassets.service.mapper.EntityMapper;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.filter.LongFilter;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
-
 @Transactional
 @Service("fixedAssetAcquisitionDeletionService")
-public class FixedAssetAcquisitionDeletionService implements DeletionService<FixedAssetAcquisition>  {
+public class FixedAssetAcquisitionDeletionService implements DeletionService<FixedAssetAcquisition> {
+
     private final FixedAssetAcquisitionRepository fixedAssetAcquisitionRepository;
     private final FixedAssetAcquisitionSearchRepository fixedAssetAcquisitionSearchRepository;
     private final FixedAssetAcquisitionQueryService fixedAssetAcquisitionQueryService;
@@ -84,7 +102,10 @@ public class FixedAssetAcquisitionDeletionService implements DeletionService<Fix
             deletableItems ->
                 fixedAssetAcquisitionSearchRepository.deleteAll(
                     // use deletable
-                    deletableItems.stream().filter(ac -> fixedAssetAcquisitionSearchRepository.existsById(ac.getId())).collect(Collectors.toList())
+                    deletableItems
+                        .stream()
+                        .filter(ac -> fixedAssetAcquisitionSearchRepository.existsById(ac.getId()))
+                        .collect(Collectors.toList())
                 )
         );
 

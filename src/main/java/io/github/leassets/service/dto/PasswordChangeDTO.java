@@ -17,6 +17,7 @@ package io.github.leassets.service.dto;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
  * A DTO representing a password change required data - current and new password.
  */

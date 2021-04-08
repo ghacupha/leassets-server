@@ -1,7 +1,7 @@
 package io.github.leassets.internal.batch.framework;
 
 /*-
- * Granular Summaries - Granular data analysis system
+ * Leassets Server - Leases and assets management platform
  * Copyright © 2021 Edwin Njeru (mailnjeru@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Scope;
  */
 @Scope("job")
 public class PersistenceJobListener implements JobExecutionListener {
+
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(PersistenceJobListener.class);
 
     private final long fileId;

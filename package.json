@@ -1,9 +1,9 @@
 {
   "name": "leassets-server",
-  "version": "0.0.1-SNAPSHOT",
+  "version": "0.0.0",
   "private": true,
-  "description": "Server for the leassets system",
-  "license": "GPLv3",
+  "description": "Description for leassetsServer",
+  "license": "UNLICENSED",
   "scripts": {
     "prettier:check": "prettier --check \"{,src/**/}*.{md,json,yml,html,java}\"",
     "prettier:format": "prettier --write \"{,src/**/}*.{md,json,yml,html,java}\"",
@@ -46,7 +46,6 @@
   },
   "devDependencies": {
     "generator-jhipster": "7.0.0",
-    "generator-jhipster-file-handling": "^1.1.1",
     "husky": "4.3.8",
     "lint-staged": "10.5.4",
     "prettier": "2.2.1",

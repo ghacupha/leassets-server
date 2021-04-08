@@ -17,6 +17,7 @@ package io.github.leassets.web.rest.vm;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
  * View Model object for storing the user's key and password.
  */

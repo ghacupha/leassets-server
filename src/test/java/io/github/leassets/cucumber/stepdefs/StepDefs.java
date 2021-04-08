@@ -17,6 +17,7 @@ package io.github.leassets.cucumber.stepdefs;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import org.springframework.test.web.servlet.ResultActions;
 
 public abstract class StepDefs {

@@ -17,6 +17,7 @@ package io.github.leassets.web.rest.errors;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 public class LoginAlreadyUsedException extends BadRequestAlertException {
 
     private static final long serialVersionUID = 1L;

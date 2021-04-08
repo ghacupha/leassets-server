@@ -1,8 +1,25 @@
 package io.github.leassets.internal.model;
 
+/*-
+ * Leassets Server - Leases and assets management platform
+ * Copyright © 2021 Edwin Njeru (mailnjeru@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelRow;
-
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -43,10 +60,21 @@ public class FixedAssetNetBookValueEVM implements Serializable {
 
     private String compilationToken;
 
-    public FixedAssetNetBookValueEVM() {
-    }
+    public FixedAssetNetBookValueEVM() {}
 
-    public FixedAssetNetBookValueEVM(Long rowIndex, Long assetNumber, String serviceOutletCode, String assetTag, String assetDescription, String netBookValueDate, String assetCategory, double netBookValue, String depreciationRegime, String fileUploadToken, String compilationToken) {
+    public FixedAssetNetBookValueEVM(
+        Long rowIndex,
+        Long assetNumber,
+        String serviceOutletCode,
+        String assetTag,
+        String assetDescription,
+        String netBookValueDate,
+        String assetCategory,
+        double netBookValue,
+        String depreciationRegime,
+        String fileUploadToken,
+        String compilationToken
+    ) {
         this.rowIndex = rowIndex;
         this.assetNumber = assetNumber;
         this.serviceOutletCode = serviceOutletCode;
@@ -82,12 +110,36 @@ public class FixedAssetNetBookValueEVM implements Serializable {
         if (this == o) return true;
         if (!(o instanceof FixedAssetNetBookValueEVM)) return false;
         FixedAssetNetBookValueEVM that = (FixedAssetNetBookValueEVM) o;
-        return Double.compare(that.getNetBookValue(), getNetBookValue()) == 0 && Objects.equals(getRowIndex(), that.getRowIndex()) && Objects.equals(getAssetNumber(), that.getAssetNumber()) && Objects.equals(getServiceOutletCode(), that.getServiceOutletCode()) && Objects.equals(getAssetTag(), that.getAssetTag()) && Objects.equals(getAssetDescription(), that.getAssetDescription()) && Objects.equals(getNetBookValueDate(), that.getNetBookValueDate()) && Objects.equals(getAssetCategory(), that.getAssetCategory()) && Objects.equals(getDepreciationRegime(), that.getDepreciationRegime()) && Objects.equals(getFileUploadToken(), that.getFileUploadToken()) && Objects.equals(getCompilationToken(), that.getCompilationToken());
+        return (
+            Double.compare(that.getNetBookValue(), getNetBookValue()) == 0 &&
+            Objects.equals(getRowIndex(), that.getRowIndex()) &&
+            Objects.equals(getAssetNumber(), that.getAssetNumber()) &&
+            Objects.equals(getServiceOutletCode(), that.getServiceOutletCode()) &&
+            Objects.equals(getAssetTag(), that.getAssetTag()) &&
+            Objects.equals(getAssetDescription(), that.getAssetDescription()) &&
+            Objects.equals(getNetBookValueDate(), that.getNetBookValueDate()) &&
+            Objects.equals(getAssetCategory(), that.getAssetCategory()) &&
+            Objects.equals(getDepreciationRegime(), that.getDepreciationRegime()) &&
+            Objects.equals(getFileUploadToken(), that.getFileUploadToken()) &&
+            Objects.equals(getCompilationToken(), that.getCompilationToken())
+        );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getRowIndex(), getAssetNumber(), getServiceOutletCode(), getAssetTag(), getAssetDescription(), getNetBookValueDate(), getAssetCategory(), getNetBookValue(), getDepreciationRegime(), getFileUploadToken(), getCompilationToken());
+        return Objects.hash(
+            getRowIndex(),
+            getAssetNumber(),
+            getServiceOutletCode(),
+            getAssetTag(),
+            getAssetDescription(),
+            getNetBookValueDate(),
+            getAssetCategory(),
+            getNetBookValue(),
+            getDepreciationRegime(),
+            getFileUploadToken(),
+            getCompilationToken()
+        );
     }
 
     public Long getRowIndex() {

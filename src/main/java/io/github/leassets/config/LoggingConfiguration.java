@@ -17,6 +17,7 @@ package io.github.leassets.config;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import static tech.jhipster.config.logging.LoggingUtils.*;
 
 import ch.qos.logback.classic.LoggerContext;
