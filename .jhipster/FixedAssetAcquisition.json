@@ -36,6 +36,7 @@
   ],
   "relationships": [],
   "service": "serviceImpl",
+  "searchEngine": "elasticsearch",
   "dto": "mapstruct",
   "jpaMetamodelFiltering": true,
   "readOnly": false,

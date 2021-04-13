@@ -26,12 +26,9 @@ spring:
     #active: testcontainers
   application:
     name: leassetsServer
-  cloud:
-    config:
-      enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:mem:leassetsserver;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:leassetsServer;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     name:
     username:
     password:
@@ -41,8 +38,9 @@ spring:
     serialization:
       write-durations-as-timestamps: false
   jpa:
-    database-platform: tech.jhipster.domain.util.FixedH2Dialect
+    database-platform: io.github.jhipster.domain.util.FixedH2Dialect
     open-in-view: false
+    show-sql: false
     hibernate:
       ddl-auto: none
       naming:
@@ -56,7 +54,14 @@ spring:
       hibernate.generate_statistics: false
       hibernate.hbm2ddl.auto: validate
       hibernate.jdbc.time_zone: UTC
-      hibernate.query.fail_on_pagination_over_collection_fetch: true
+  data:
+    elasticsearch:
+      properties:
+        path:
+          home: target/elasticsearch
+        # See https://github.com/jhipster/generator-jhipster/issues/10302
+        node:
+          max_local_storage_nodes: 2
   liquibase:
     contexts: test
   mail:
@@ -110,6 +115,11 @@ jhipster:
         base64-secret: ZjU3NjcyZjE3ODM4YmFmMzJhM2NlOTMwYjM3NzM1MzJhMjdiNTQyMjE4ZTZkZTMzMmJiZDUwZjBmYTNhOGY2NTYwMDliM2I5MjUzZGY0NmUzMmM4Y2NjNjZiMjJlOWFjM2ZkMWNhMzA4MzFjYjdiNWNmNzBmZjhiODBlODcxZGQ=
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
+  metrics:
+    logs: # Reports metrics in the logs
+      enabled: true
+      report-frequency: 60 # in seconds
+
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class

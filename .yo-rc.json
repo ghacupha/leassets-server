@@ -1,13 +1,13 @@
 {
   "generator-jhipster": {
     "promptValues": {
-      "packageName": "io.github.leassets"
+      "packageName": "tech.leassets"
     },
-    "jhipsterVersion": "7.0.0",
+    "jhipsterVersion": "6.10.5",
     "applicationType": "monolith",
     "baseName": "leassetsServer",
-    "packageName": "io.github.leassets",
-    "packageFolder": "io/github/leassets",
+    "packageName": "tech.leassets",
+    "packageFolder": "tech/leassets",
     "serverPort": "9100",
     "authenticationType": "jwt",
     "cacheProvider": "hazelcast",
@@ -45,15 +45,7 @@
     "reactive": false,
     "nativeLanguage": "en",
     "languages": ["en", "fr"],
-    "entities": [
-      "FixedAssetAcquisition",
-      "FixedAssetNetBookValue",
-      "FixedAssetDepreciation",
-      "CurrencyTable",
-      "LeassetsFileType",
-      "LeassetsFileUpload",
-      "LeassetsMessageToken"
-    ],
+    "entities": ["FixedAssetAcquisition", "FixedAssetNetBookValue", "FixedAssetDepreciation"],
     "lastLiquibaseTimestamp": 1616499421000
   },
   "generator-jhipster-file-handling": {

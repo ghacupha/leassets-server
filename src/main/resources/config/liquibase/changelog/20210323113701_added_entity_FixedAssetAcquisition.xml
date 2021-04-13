@@ -3,9 +3,10 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+    
     <!--
         Added the entity FixedAssetAcquisition.
     -->
@@ -15,7 +16,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="asset_number" type="bigint">
-                <constraints nullable="true" unique="true" uniqueConstraintName="ux_fixed_asset_acquisition__asset_number" />
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_fixed_asset_acquisition_asset_number" />
             </column>
             <column name="service_outlet_code" type="varchar(255)">
                 <constraints nullable="true" />
@@ -42,6 +43,9 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="20210323113701-1-relations" author="jhipster">
+
+    </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
 
     <!--
@@ -69,4 +73,5 @@
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
+
 </databaseChangeLog>
