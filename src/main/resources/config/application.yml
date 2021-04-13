@@ -171,14 +171,14 @@ jhipster:
     from: leassetsServer@localhost
   swagger:
     default-include-pattern: /api/.*
-    title: leassetsServer API
-    description: leassetsServer API documentation
-    version: 0.0.1
+    title: Leassets Server API
+    description: Leassets Server API documentation
+    version: 0.0.1-SNAPSHOT
     terms-of-service-url:
-    contact-name:
+    contact-name: Edwin Njeru
     contact-url:
-    contact-email:
-    license: unlicensed
+    contact-email: mailnjeru@gmail.com
+    license: GPLv3
     license-url:
 # ===================================================================
 # Application specific properties

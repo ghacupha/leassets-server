@@ -1,9 +1,9 @@
 {
   "name": "leassets-server",
-  "version": "0.0.0",
-  "description": "Description for leassetsServer",
+  "version": "0.0.1-SNAPSHOT",
+  "description": "Back end service for leases and assets management app",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "GPLv3",
   "cacheDirectories": [
     "node_modules"
   ],
