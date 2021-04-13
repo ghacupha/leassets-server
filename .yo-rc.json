@@ -1,0 +1,67 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "io.github.leassets"
+    },
+    "jhipsterVersion": "7.0.0",
+    "applicationType": "monolith",
+    "baseName": "leassetsServer",
+    "packageName": "io.github.leassets",
+    "packageFolder": "io/github/leassets",
+    "serverPort": "9100",
+    "authenticationType": "jwt",
+    "cacheProvider": "hazelcast",
+    "enableHibernateCache": true,
+    "websocket": "spring-websocket",
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": "elasticsearch",
+    "messageBroker": false,
+    "serviceDiscoveryType": "eureka",
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "ZjU3NjcyZjE3ODM4YmFmMzJhM2NlOTMwYjM3NzM1MzJhMjdiNTQyMjE4ZTZkZTMzMmJiZDUwZjBmYTNhOGY2NTYwMDliM2I5MjUzZGY0NmUzMmM4Y2NjNjZiMjJlOWFjM2ZkMWNhMzA4MzFjYjdiNWNmNzBmZjhiODBlODcxZGQ=",
+    "embeddableLaunchScript": false,
+    "creationTimestamp": 1614499334810,
+    "testFrameworks": ["gatling", "cucumber"],
+    "jhiPrefix": "gha",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "clientPackageManager": "npm",
+    "blueprints": [],
+    "skipClient": true,
+    "clientFramework": "angularX",
+    "skipUserManagement": false,
+    "withAdminUi": true,
+    "clientTheme": "none",
+    "clientThemeVariant": "",
+    "skipServer": false,
+    "skipCheckLengthOfIdentifier": false,
+    "skipFakeData": false,
+    "pages": [],
+    "reactive": false,
+    "nativeLanguage": "en",
+    "languages": ["en", "fr"],
+    "entities": [
+      "FixedAssetAcquisition",
+      "FixedAssetNetBookValue",
+      "FixedAssetDepreciation",
+      "CurrencyTable",
+      "LeassetsFileType",
+      "LeassetsFileUpload",
+      "LeassetsMessageToken"
+    ],
+    "lastLiquibaseTimestamp": 1616499421000
+  },
+  "generator-jhipster-file-handling": {
+    "promptValues": {
+      "gatewayMicroserviceName": "leassets",
+      "generalClientRootFolder": "files",
+      "fileModelTypes": "FIXED_ASSET_ACQUISITION,FIXED_ASSET_DEPRECIATION,FIXED_ASSET_NBV"
+    },
+    "lastLiquibaseTimestamp": 1616939996000
+  }
+}
