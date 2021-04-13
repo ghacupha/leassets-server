@@ -25,7 +25,7 @@
     <properties>
         <!-- Build properties -->
         <maven.version>3.3.9</maven.version>
-        <java.version>11</java.version>
+        <java.version>15</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
@@ -61,8 +61,9 @@
         <javassist.version>3.27.0-GA</javassist.version>
         <!-- The liquibase version should match the one managed by
         https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies/${spring-boot.version} -->
-        <liquibase.version>4.3.1</liquibase.version>
-        <liquibase-hibernate5.version>4.3.1</liquibase-hibernate5.version>
+        <!--// Regression due to non-persistence of CLOB fields; see issue 14463-->
+        <liquibase.version>3.10.2</liquibase.version>
+        <liquibase-hibernate5.version>3.10.2</liquibase-hibernate5.version>
         <lombok.version>1.18.20</lombok.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <jaxb-runtime.version>2.3.3</jaxb-runtime.version>
