@@ -54,6 +54,6 @@
       "generalClientRootFolder": "files",
       "fileModelTypes": "FIXED_ASSET_ACQUISITION,FIXED_ASSET_DEPRECIATION,FIXED_ASSET_NBV"
     },
-    "lastLiquibaseTimestamp": 1618298175000
+    "lastLiquibaseTimestamp": 1618411432000
   }
 }
