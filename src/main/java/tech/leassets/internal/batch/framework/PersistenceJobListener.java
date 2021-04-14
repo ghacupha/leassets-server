@@ -1,5 +1,22 @@
-package tech.leassets.internal.batch;
+package tech.leassets.internal.batch.framework;
 
+/*-
+ * Leassets Server - Leases and assets management platform
+ * Copyright © 2021 Edwin Njeru (mailnjeru@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 import org.slf4j.Logger;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
@@ -10,6 +27,7 @@ import org.springframework.context.annotation.Scope;
  */
 @Scope("job")
 public class PersistenceJobListener implements JobExecutionListener {
+
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(PersistenceJobListener.class);
 
     private final long fileId;
@@ -27,9 +45,7 @@ public class PersistenceJobListener implements JobExecutionListener {
      */
     @Override
     public void beforeJob(final JobExecution jobExecution) {
-
         log.info("New job id : {} has started for file id : {}, with start time : {}", jobExecution.getJobId(), fileId, startUpTime);
-
     }
 
     /**
@@ -39,9 +55,14 @@ public class PersistenceJobListener implements JobExecutionListener {
      */
     @Override
     public void afterJob(final JobExecution jobExecution) {
-
         String exitStatus = jobExecution.getExitStatus().getExitCode();
 
-        log.info("Job Id {}, for file-id : {} completed in : {}ms with status {}", jobExecution.getJobId(), fileId, System.currentTimeMillis() - startUpTime, exitStatus);
+        log.info(
+            "Job Id {}, for file-id : {} completed in : {}ms with status {}",
+            jobExecution.getJobId(),
+            fileId,
+            System.currentTimeMillis() - startUpTime,
+            exitStatus
+        );
     }
 }

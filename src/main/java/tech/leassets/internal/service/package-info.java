@@ -1,11 +1,28 @@
+/*-
+ * Leassets Server - Leases and assets management platform
+ * Copyright © 2021 Edwin Njeru (mailnjeru@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 /**
  * Package contains services called in a typical batch process workflow
- * 
- * For instance if we have a service for a SchemeTable entity it might look like so : 
- * 
- * {@code 
- * 
-        package tech.leassets.internal.service;
+ *
+ * For instance if we have a service for a SchemeTable entity it might look like so :
+ *
+ * {@code
+ *
+        package io.github.leassets.internal.service;
 
         import io.github.deposits.repository.SchemeTableRepository;
         import io.github.deposits.repository.search.SchemeTableSearchRepository;
@@ -42,7 +59,7 @@
             }
         }
  * }
- * 
+ *
  * Of course you have to have the typical jhipster-like repositories and service setup
  */
 package tech.leassets.internal.service;

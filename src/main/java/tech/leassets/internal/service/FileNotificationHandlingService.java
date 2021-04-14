@@ -1,9 +1,27 @@
 package tech.leassets.internal.service;
 
+/*-
+ * Leassets Server - Leases and assets management platform
+ * Copyright © 2021 Edwin Njeru (mailnjeru@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import tech.leassets.domain.LeassetsMessageToken;
-import tech.leassets.internal.model.FileNotification;
 import tech.leassets.internal.fileProcessing.FileUploadProcessorChain;
+import tech.leassets.internal.model.framework.FileNotification;
 import tech.leassets.internal.util.TokenGenerator;
 import tech.leassets.service.LeassetsFileUploadService;
 import tech.leassets.service.LeassetsMessageTokenService;
@@ -34,7 +52,13 @@ public class FileNotificationHandlingService implements HandlingService<FileNoti
     private final LeassetsFileUploadService fileUploadService;
     private final FileUploadProcessorChain fileUploadProcessorChain;
 
-    public FileNotificationHandlingService(TokenGenerator tokenGenerator, LeassetsMessageTokenService messageTokenService, LeassetsMessageTokenMapper messageTokenMapper, LeassetsFileUploadService fileUploadService, FileUploadProcessorChain fileUploadProcessorChain) {
+    public FileNotificationHandlingService(
+        TokenGenerator tokenGenerator,
+        LeassetsMessageTokenService messageTokenService,
+        LeassetsMessageTokenMapper messageTokenMapper,
+        LeassetsFileUploadService fileUploadService,
+        FileUploadProcessorChain fileUploadProcessorChain
+    ) {
         this.tokenGenerator = tokenGenerator;
         this.messageTokenService = messageTokenService;
         this.messageTokenMapper = messageTokenMapper;
@@ -45,11 +69,10 @@ public class FileNotificationHandlingService implements HandlingService<FileNoti
     @Override
     @Async
     public void handle(FileNotification payload) {
-
         log.info("File notification received for: {}", payload.getFilename());
 
         // Generate token before getting timestamps
-        String token  = getToken(payload);
+        String token = getToken(payload);
 
         long timestamp = System.currentTimeMillis();
         payload.setTimestamp(timestamp);
@@ -65,8 +88,9 @@ public class FileNotificationHandlingService implements HandlingService<FileNoti
             payload.setMessageToken(messageToken.getTokenValue());
         }
 
-        LeassetsFileUploadDTO fileUpload =
-            fileUploadService.findOne(Long.parseLong(payload.getFileId())).orElseThrow(() -> new IllegalArgumentException("Id # : " + payload.getFileId() + " does not exist"));
+        LeassetsFileUploadDTO fileUpload = fileUploadService
+            .findOne(Long.parseLong(payload.getFileId()))
+            .orElseThrow(() -> new IllegalArgumentException("Id # : " + payload.getFileId() + " does not exist"));
 
         log.debug("FileUploadDTO object fetched from DB with id: {}", fileUpload.getId());
         if (!PROCESSED_TOKENS.contains(payload.getMessageToken())) {
@@ -84,7 +108,6 @@ public class FileNotificationHandlingService implements HandlingService<FileNoti
 
         LeassetsMessageTokenDTO dto = messageTokenService.save(messageTokenMapper.toDto(messageToken));
         dto.setContentFullyEnqueued(true);
-
     }
 
     private String getToken(FileNotification payload) {

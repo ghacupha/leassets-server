@@ -1,7 +1,7 @@
 package tech.leassets.internal.fileProcessing;
 
 import com.google.common.collect.ImmutableList;
-import tech.leassets.internal.model.FileNotification;
+import tech.leassets.internal.model.framework.FileNotification;
 import tech.leassets.service.dto.LeassetsFileUploadDTO;
 import org.slf4j.Logger;
 

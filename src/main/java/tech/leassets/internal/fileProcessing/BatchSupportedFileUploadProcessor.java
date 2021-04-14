@@ -1,7 +1,7 @@
 package tech.leassets.internal.fileProcessing;
 
-import tech.leassets.internal.model.FileNotification;
 import tech.leassets.domain.enumeration.LeassetsFileModelType;
+import tech.leassets.internal.model.framework.FileNotification;
 import tech.leassets.service.dto.LeassetsFileUploadDTO;
 import org.slf4j.Logger;
 import org.springframework.batch.core.Job;

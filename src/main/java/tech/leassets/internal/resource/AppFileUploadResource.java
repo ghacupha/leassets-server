@@ -1,6 +1,6 @@
 package tech.leassets.internal.resource;
 
-import tech.leassets.internal.model.FileNotification;
+import tech.leassets.internal.model.framework.FileNotification;
 import tech.leassets.internal.resource.decorator.IFileUploadResource;
 import tech.leassets.internal.service.HandlingService;
 import tech.leassets.domain.LeassetsFileType;
