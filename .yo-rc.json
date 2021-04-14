@@ -1,13 +1,13 @@
 {
   "generator-jhipster": {
     "promptValues": {
-      "packageName": "tech.leassets"
+      "packageName": "io.github.leassets"
     },
     "jhipsterVersion": "6.10.5",
     "applicationType": "monolith",
     "baseName": "leassetsServer",
-    "packageName": "tech.leassets",
-    "packageFolder": "tech/leassets",
+    "packageName": "io.github.leassets",
+    "packageFolder": "io/github/leassets",
     "serverPort": "9100",
     "authenticationType": "jwt",
     "cacheProvider": "hazelcast",
@@ -35,7 +35,7 @@
     "skipClient": true,
     "clientFramework": "angularX",
     "skipUserManagement": false,
-    "withAdminUi": true,
+    "withAdminUi": false,
     "clientTheme": "none",
     "clientThemeVariant": "",
     "skipServer": false,

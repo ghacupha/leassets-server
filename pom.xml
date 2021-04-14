@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>tech.leassets</groupId>
+    <groupId>io.github.leassets</groupId>
     <artifactId>leassets-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -23,8 +23,7 @@
     <properties>
         <!-- Build properties -->
         <maven.version>3.3.9</maven.version>
-        <java.version>15</java.version>
-        <start-class>tech.leassets.LeassetsServerApp</start-class>
+        <java.version>13</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
@@ -115,13 +114,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>io.github.jhipster</groupId>
             <artifactId>jhipster-framework</artifactId>
@@ -130,6 +122,7 @@
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
@@ -380,15 +373,6 @@
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-spring</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ozlerhakan</groupId>
-            <artifactId>poiji</artifactId>
-            <version>1.20.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-batch</artifactId>
         </dependency>
         <!-- jhipster-needle-maven-add-dependency -->
     </dependencies>
@@ -705,7 +689,6 @@
                             <image>adoptopenjdk:11-jre-hotspot</image>
                         </from>
                         <to>
-<!--                            <image>${docker.image.prefix}/${project.artifactId}:${project.version}</image>-->
                             <image>${docker.image.prefix}/${project.artifactId}:${project.version}</image>
                         </to>
                         <container>
@@ -830,7 +813,7 @@
                             </requireMavenVersion>
                             <requireJavaVersion>
                                 <message>You are running an incompatible version of Java. JHipster supports JDK 8 to 14.</message>
-                                <version>[1.8,16)</version>
+                                <version>[1.8,15)</version>
                             </requireJavaVersion>
                         </rules>
                     </configuration>
