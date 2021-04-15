@@ -1,5 +1,6 @@
 package io.github.leassets.internal.resource;
 
+import io.github.jhipster.web.util.HeaderUtil;
 import io.github.leassets.internal.model.FileNotification;
 import io.github.leassets.internal.resource.decorator.IFileUploadResource;
 import io.github.leassets.internal.framework.service.HandlingService;
@@ -9,6 +10,7 @@ import io.github.leassets.service.dto.LeassetsFileUploadCriteria;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,16 +37,23 @@ import java.util.Objects;
 @RequestMapping("/api/app")
 public class AppFileUploadResource implements IFileUploadResource {
 
+    private static final String ENTITY_NAME = "granularGranularFileUpload";
+
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
+
     private final Logger log = LoggerFactory.getLogger(AppFileUploadResource.class);
 
     private final IFileUploadResource fileUploadResource;
     private final HandlingService<FileNotification> fileNotificationHandlingService;
+    private final HandlingService<Long> fileDeletionHandlingService;
     private final LeassetsFileTypeService fileTypeService;
 
     public AppFileUploadResource(final IFileUploadResource fileUploadResourceDecorator, final HandlingService<FileNotification> fileNotificationHandlingService,
-                                 final LeassetsFileTypeService fileTypeService) {
+                                 HandlingService<Long> fileDeletionHandlingService, final LeassetsFileTypeService fileTypeService) {
         this.fileUploadResource = fileUploadResourceDecorator;
         this.fileNotificationHandlingService = fileNotificationHandlingService;
+        this.fileDeletionHandlingService = fileDeletionHandlingService;
         this.fileTypeService = fileTypeService;
     }
 
@@ -137,6 +146,13 @@ public class AppFileUploadResource implements IFileUploadResource {
     @DeleteMapping("/file-uploads/{id}")
     public ResponseEntity<Void> deleteFileUpload(@PathVariable Long id) {
 
-        return fileUploadResource.deleteFileUpload(id);
+        /*return fileUploadResource.deleteFileUpload(id);*/
+        fileDeletionHandlingService.handle(id);
+
+        log.debug("REST request to delete GranularFileUpload : {}; Queued for handling", id);
+        return ResponseEntity
+            .noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

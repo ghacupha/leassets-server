@@ -43,6 +43,14 @@ public class FileUploadProcessorContainer {
         // Create the chain, each should match against it's specific key of data-model type
         theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, currencyTablePersistenceJob, CURRENCY_LIST));
         theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetAcquisitionListPersistenceJob, FIXED_ASSET_ACQUISITION));
+        return theChain;
+    }
+
+    // configuration for deletion jobs
+    @Bean("fileUploadDeletionProcessorChain")
+    public FileUploadProcessorChain fileUploadDeletionProcessorChain() {
+        FileUploadProcessorChain theChain = new FileUploadProcessorChain();
+
         theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetAcquisitionListDeletionJob, FIXED_ASSET_ACQUISITION));
 
         return theChain;
