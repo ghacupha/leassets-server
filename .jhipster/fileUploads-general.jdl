@@ -1,0 +1,58 @@
+entity LeassetsFileType {
+leassetsFileTypeName String required unique,
+leassetsFileMediumType LeassetsFileMediumTypes required,
+description String,
+fileTemplate AnyBlob,
+leassetsfileType LeassetsFileModelType
+}
+entity LeassetsFileUpload {
+description String required,
+fileName String required unique,
+periodFrom LocalDate,
+periodTo LocalDate,
+leassetsFileTypeId Long required,
+dataFile AnyBlob required,
+uploadSuccessful Boolean,
+uploadProcessed Boolean,
+uploadToken String unique
+}
+entity LeassetsMessageToken {
+description String,
+timeSent Long required,
+tokenValue String required,
+received Boolean,
+actioned Boolean,
+contentFullyEnqueued Boolean
+}
+entity CurrencyTable {
+currencyCode String unique minlength(3) maxlength(3),
+locality CurrencyLocality required,
+currencyName String,
+country String
+}
+enum CurrencyLocality {
+LOCAL,
+FOREIGN
+}
+enum LeassetsFileMediumTypes {
+EXCEL,
+EXCEL_XLS,
+EXCEL_XLSX,
+EXCEL_XLSB,
+EXCEL_CSV,
+EXCEL_XML,
+PDF,
+POWERPOINT,
+DOC,
+TEXT,
+JSON,
+HTML5
+}
+enum LeassetsFileModelType { CURRENCY_LIST,FIXED_ASSET_ACQUISITION,FIXED_ASSET_DEPRECIATION,FIXED_ASSET_NBV }
+dto LeassetsFileUpload, LeassetsMessageToken, CurrencyTable with mapstruct
+paginate LeassetsFileType, LeassetsFileUpload, LeassetsMessageToken, CurrencyTable with pagination
+service LeassetsFileUpload, LeassetsMessageToken, CurrencyTable with serviceImpl
+service LeassetsFileType with serviceClass
+search CurrencyTable with elasticsearch
+filter LeassetsFileType, LeassetsFileUpload, LeassetsMessageToken, CurrencyTable
+clientRootFolder LeassetsFileType, LeassetsFileUpload, LeassetsMessageToken, CurrencyTable with leassets
