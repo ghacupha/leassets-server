@@ -18,10 +18,26 @@ package io.github.leassets.internal.framework.batch;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Its expected to be a file-upload wrapping an byte-stream object names as "dataFile"
- */
-public interface HasDataFile extends HasUploadToken, HasIndex {
+import io.github.leassets.internal.framework.BatchService;
+import org.springframework.batch.item.ItemWriter;
 
-    byte[] getDataFile();
+import java.util.List;
+
+/**
+ * Performs persistence of the newly created entities through the batch-service
+ *
+ * @param <DTO>
+ */
+public class EntityListItemsWriter<DTO> implements ItemWriter<List<DTO>> {
+
+    private final BatchService<DTO> batchService;
+
+    public EntityListItemsWriter(BatchService<DTO> batchService) {
+        this.batchService = batchService;
+    }
+
+    @Override
+    public void write(List<? extends List<DTO>> items) throws Exception {
+        items.stream().peek(batchService::save).forEach(batchService::index);
+    }
 }

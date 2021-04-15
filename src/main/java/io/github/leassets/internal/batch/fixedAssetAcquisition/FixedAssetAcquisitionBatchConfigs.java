@@ -18,19 +18,21 @@
 package io.github.leassets.internal.batch.fixedAssetAcquisition;
 
 import com.google.common.collect.ImmutableList;
+import io.github.leassets.domain.LeassetsFileUpload;
+import io.github.leassets.domain.LeassetsMessageToken;
 import io.github.leassets.internal.framework.FileUploadsProperties;
 import io.github.leassets.domain.FixedAssetAcquisition;
 import io.github.leassets.internal.excel.ExcelFileDeserializer;
 import io.github.leassets.internal.framework.BatchService;
 import io.github.leassets.internal.framework.Mapping;
-import io.github.leassets.internal.framework.batch.BatchPersistentFileUploadService;
-import io.github.leassets.internal.framework.batch.DeletionService;
-import io.github.leassets.internal.framework.batch.EntityItemsReader;
+import io.github.leassets.internal.framework.batch.*;
+import io.github.leassets.internal.framework.service.DeletionUploadService;
 import io.github.leassets.internal.framework.service.FileUploadPersistenceService;
 import io.github.leassets.internal.framework.service.TokenPersistenceService;
 import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
 import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
+import io.github.leassets.service.dto.LeassetsMessageTokenDTO;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -95,7 +97,7 @@ public class FixedAssetAcquisitionBatchConfigs {
     private Mapping<FixedAssetAcquisitionEVM, FixedAssetAcquisitionDTO> mapping;
 
     @Autowired
-    private TokenPersistenceService<FixedAssetAcquisitionDTO, FixedAssetAcquisition> fileUploadTokenService;
+    private DeletionUploadService<LeassetsFileUploadDTO> deletionFileUploadService;
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -119,7 +121,6 @@ public class FixedAssetAcquisitionBatchConfigs {
     public ItemProcessor<List<FixedAssetAcquisitionEVM>, List<FixedAssetAcquisitionDTO>> listItemsProcessor(
         @Value("#{jobParameters['messageToken']}") String jobUploadToken
     ) {
-        //        return new FixedAssetAcquisitionListItemProcessor(mapping, jobUploadToken);
         return evms ->
             evms.stream().map(mapping::toValue2).peek(d -> d.setFileUploadToken(jobUploadToken)).collect(ImmutableList.toImmutableList());
     }
@@ -167,7 +168,7 @@ public class FixedAssetAcquisitionBatchConfigs {
     @Bean(DELETION_READER_NAME)
     @JobScope
     public ItemReader<List<Long>> deletionReader(@Value("#{jobParameters['fileId']}") long fileId) {
-        return new EntityItemsDeletionReader(fileId, fileUploadService, fileUploadsProperties, fileUploadTokenService);
+        return new EntityItemsDeletionReader<>(fileId, deletionFileUploadService, fileUploadsProperties);
     }
 
     @Bean(DELETION_PROCESSOR_NAME)

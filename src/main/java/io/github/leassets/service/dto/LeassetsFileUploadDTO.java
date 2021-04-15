@@ -1,16 +1,19 @@
 package io.github.leassets.service.dto;
 
 import io.github.leassets.internal.framework.batch.HasDataFile;
+import io.github.leassets.internal.framework.batch.HasIndex;
 
 import java.time.LocalDate;
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Objects;
 import javax.persistence.Lob;
 
 /**
  * A DTO for the {@link io.github.leassets.domain.LeassetsFileUpload} entity.
  */
-public class LeassetsFileUploadDTO implements Serializable, HasDataFile<LeassetsFileUploadDTO> {
+public class LeassetsFileUploadDTO implements Serializable, HasDataFile, HasIndex {
 
     private Long id;
 
@@ -129,19 +132,17 @@ public class LeassetsFileUploadDTO implements Serializable, HasDataFile<Leassets
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof LeassetsFileUploadDTO)) {
-            return false;
-        }
-
-        return id != null && id.equals(((LeassetsFileUploadDTO) o).id);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LeassetsFileUploadDTO that = (LeassetsFileUploadDTO) o;
+        return Objects.equals(id, that.id) && Objects.equals(description, that.description) && Objects.equals(fileName, that.fileName) && Objects.equals(periodFrom, that.periodFrom) && Objects.equals(periodTo, that.periodTo) && Objects.equals(leassetsFileTypeId, that.leassetsFileTypeId) && Arrays.equals(dataFile, that.dataFile) && Objects.equals(dataFileContentType, that.dataFileContentType) && Objects.equals(uploadSuccessful, that.uploadSuccessful) && Objects.equals(uploadProcessed, that.uploadProcessed) && Objects.equals(uploadToken, that.uploadToken);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        int result = Objects.hash(id, description, fileName, periodFrom, periodTo, leassetsFileTypeId, dataFileContentType, uploadSuccessful, uploadProcessed, uploadToken);
+        result = 31 * result + Arrays.hashCode(dataFile);
+        return result;
     }
 
     // prettier-ignore

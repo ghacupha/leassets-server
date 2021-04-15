@@ -21,7 +21,7 @@ package io.github.leassets.internal.framework.batch;
 /**
  * Represents and entity that contains a string upload-token
  */
-public interface HasUploadToken<D> {
+public interface HasUploadToken {
     /**
      * Takes a string token and applies the same to the client
      *
@@ -30,10 +30,4 @@ public interface HasUploadToken<D> {
     void setUploadToken(String uploadToken);
 
     String getUploadToken();
-    //    /**
-    //     * Simply returns the client's instance
-    //     *
-    //     * @return
-    //     */
-    //    D getChild();
 }

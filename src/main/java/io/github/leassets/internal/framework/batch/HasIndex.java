@@ -19,9 +19,10 @@ package io.github.leassets.internal.framework.batch;
  */
 
 /**
- * Its expected to be a file-upload wrapping an byte-stream object names as "dataFile"
+ * Adds a Long type identification index to the client
+ *
  */
-public interface HasDataFile extends HasUploadToken, HasIndex {
+public interface HasIndex {
 
-    byte[] getDataFile();
+    Long getId();
 }
