@@ -1,5 +1,7 @@
 package io.github.leassets.service.dto;
 
+import io.github.leassets.internal.framework.batch.HasIndex;
+
 import java.time.LocalDate;
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -8,11 +10,11 @@ import java.math.BigDecimal;
 /**
  * A DTO for the {@link io.github.leassets.domain.FixedAssetAcquisition} entity.
  */
-public class FixedAssetAcquisitionDTO implements Serializable {
-    
+public class FixedAssetAcquisitionDTO implements Serializable, HasIndex {
+
     private Long id;
 
-    
+
     private Long assetNumber;
 
     private String serviceOutletCode;
@@ -29,7 +31,7 @@ public class FixedAssetAcquisitionDTO implements Serializable {
 
     private String fileUploadToken;
 
-    
+
     public Long getId() {
         return id;
     }

@@ -97,20 +97,20 @@ public class FixedAssetAcquisitionBatchConfigs {
     private Mapping<FixedAssetAcquisitionEVM, FixedAssetAcquisitionDTO> mapping;
 
     @Autowired
-    private DeletionUploadService<LeassetsFileUploadDTO> deletionFileUploadService;
-
-    @Autowired
     private JobBuilderFactory jobBuilderFactory;
 
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
     @Autowired
-    private BatchPersistentFileUploadService<LeassetsFileUploadDTO> fileUploadService;
+    private BatchPersistentFileUploadService fileUploadService;
+
+    @Autowired
+    private DeletionUploadService<FixedAssetAcquisitionDTO> fileUploadDeletionService;
 
     @Bean(PERSISTENCE_READER_NAME)
     @JobScope
-    public EntityItemsReader<LeassetsFileUploadDTO, FixedAssetAcquisitionEVM> listItemReader(
+    public EntityItemsReader<FixedAssetAcquisitionEVM> listItemReader(
         @Value("#{jobParameters['fileId']}") long fileId
     ) {
         return new EntityItemsReader<>(fixedAssetAcquisitionDeserializer, fileUploadService, fileId, fileUploadsProperties);
@@ -165,10 +165,12 @@ public class FixedAssetAcquisitionBatchConfigs {
         );
     }
 
+
+
     @Bean(DELETION_READER_NAME)
     @JobScope
     public ItemReader<List<Long>> deletionReader(@Value("#{jobParameters['fileId']}") long fileId) {
-        return new EntityItemsDeletionReader<>(fileId, deletionFileUploadService, fileUploadsProperties);
+        return new EntityItemsDeletionReader(fileId, fileUploadDeletionService, fileUploadsProperties);
     }
 
     @Bean(DELETION_PROCESSOR_NAME)

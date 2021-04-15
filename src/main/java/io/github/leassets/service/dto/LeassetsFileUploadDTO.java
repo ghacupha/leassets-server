@@ -132,17 +132,19 @@ public class LeassetsFileUploadDTO implements Serializable, HasDataFile, HasInde
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LeassetsFileUploadDTO that = (LeassetsFileUploadDTO) o;
-        return Objects.equals(id, that.id) && Objects.equals(description, that.description) && Objects.equals(fileName, that.fileName) && Objects.equals(periodFrom, that.periodFrom) && Objects.equals(periodTo, that.periodTo) && Objects.equals(leassetsFileTypeId, that.leassetsFileTypeId) && Arrays.equals(dataFile, that.dataFile) && Objects.equals(dataFileContentType, that.dataFileContentType) && Objects.equals(uploadSuccessful, that.uploadSuccessful) && Objects.equals(uploadProcessed, that.uploadProcessed) && Objects.equals(uploadToken, that.uploadToken);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof LeassetsFileUploadDTO)) {
+            return false;
+        }
+
+        return id != null && id.equals(((LeassetsFileUploadDTO) o).id);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, description, fileName, periodFrom, periodTo, leassetsFileTypeId, dataFileContentType, uploadSuccessful, uploadProcessed, uploadToken);
-        result = 31 * result + Arrays.hashCode(dataFile);
-        return result;
+        return 31;
     }
 
     // prettier-ignore

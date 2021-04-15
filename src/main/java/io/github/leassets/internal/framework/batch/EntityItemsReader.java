@@ -33,24 +33,23 @@ import java.util.List;
  * Abstract implementation for reading data from an excel data file and then introducing the
  * same data into the batch process in small chunks of pre-configured chunks
  *
- * @param <F> Type of file-upload data transfer object
  * @param <EVM> Type of object represented in a row of the file in the data transfer object
  */
-public class EntityItemsReader<F, EVM> implements ItemReader<List<EVM>> {
+public class EntityItemsReader<EVM> implements ItemReader<List<EVM>> {
 
     private static final Logger log = LoggerFactory.getLogger(EntityItemsReader.class);
 
     private final FileUploadsProperties fileUploadsProperties;
 
     private final ExcelFileDeserializer<EVM> deserializer;
-    private final BatchPersistentFileUploadService<F> fileUploadService;
+    private final BatchPersistentFileUploadService fileUploadService;
     private final long fileId;
 
     private ListPartition<EVM> evmListPartition;
 
     public EntityItemsReader(
         final ExcelFileDeserializer<EVM> deserializer,
-        final BatchPersistentFileUploadService<F> fileUploadService,
+        final BatchPersistentFileUploadService fileUploadService,
         @Value("#{jobParameters['fileId']}") long fileId,
         final FileUploadsProperties fileUploadsProperties
     ) {

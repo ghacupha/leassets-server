@@ -39,12 +39,12 @@ import java.util.stream.Collectors;
  * a given data file,  given that the data has been marked with the same unique file-upload-token
  * of the file-upload entity's instance
  */
-public class EntityItemsDeletionReader<DTO> implements ItemReader<List<Long>> {
+public class EntityItemsDeletionReader implements ItemReader<List<Long>> {
 
     private static final Logger log = LoggerFactory.getLogger(EntityItemsDeletionReader.class);
     private final long fileId;
 
-    private final DeletionUploadService<DTO> fileUploadService;
+    private final DeletionUploadService<? extends HasIndex> fileUploadService;
     private final FileUploadsProperties fileUploadsProperties;
 
     // TODO Initialize later, not in the constructor
@@ -60,7 +60,7 @@ public class EntityItemsDeletionReader<DTO> implements ItemReader<List<Long>> {
      */
     public EntityItemsDeletionReader(
         final @Value("#{jobParameters['fileId']}") long fileId,
-        final DeletionUploadService<DTO> fileUploadService,
+        final DeletionUploadService<? extends HasIndex> fileUploadService,
         final FileUploadsProperties fileUploadsProperties
     ) {
         this.fileId = fileId;
@@ -81,9 +81,9 @@ public class EntityItemsDeletionReader<DTO> implements ItemReader<List<Long>> {
                     fileUploadService
                         .findAllByUploadToken(messageToken)
                         .ifPresent(
-                            (List<HasDataFile> entities) -> {
+                            entities -> {
                                 // TODO pass actual entities for deletion
-                                unProcessedItems.addAll(entities.stream().map(HasDataFile::getId).collect(Collectors.toList()));
+                                unProcessedItems.addAll(entities.stream().map(HasIndex::getId).collect(Collectors.toList()));
                             }
                         );
                 }

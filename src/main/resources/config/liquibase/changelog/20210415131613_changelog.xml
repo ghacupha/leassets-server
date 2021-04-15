@@ -1,0 +1,229 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.9.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-1">
+        <createSequence incrementBy="50" sequenceName="sequence_generator" startValue="1"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-2">
+        <createTable tableName="currency_table">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="currency_tablePK"/>
+            </column>
+            <column name="country" type="VARCHAR(255)"/>
+            <column name="currency_code" type="VARCHAR(3)"/>
+            <column name="currency_name" type="VARCHAR(255)"/>
+            <column name="locality" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-3">
+        <createTable tableName="fixed_asset_acquisition">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="fixed_asset_acquisitionPK"/>
+            </column>
+            <column name="asset_category" type="VARCHAR(255)"/>
+            <column name="asset_description" type="VARCHAR(255)"/>
+            <column name="asset_number" type="BIGINT"/>
+            <column name="asset_tag" type="VARCHAR(255)"/>
+            <column name="file_upload_token" type="VARCHAR(255)"/>
+            <column name="purchase_date" type="date"/>
+            <column name="purchase_price" type="numeric(21, 2)"/>
+            <column name="service_outlet_code" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-4">
+        <createTable tableName="fixed_asset_depreciation">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="fixed_asset_depreciationPK"/>
+            </column>
+            <column name="asset_category" type="VARCHAR(255)"/>
+            <column name="asset_description" type="VARCHAR(255)"/>
+            <column name="asset_number" type="BIGINT"/>
+            <column name="asset_tag" type="VARCHAR(255)"/>
+            <column name="compilation_token" type="VARCHAR(255)"/>
+            <column name="depreciation_amount" type="numeric(21, 2)"/>
+            <column name="depreciation_date" type="date"/>
+            <column name="depreciation_regime" type="VARCHAR(255)"/>
+            <column name="file_upload_token" type="VARCHAR(255)"/>
+            <column name="service_outlet_code" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-5">
+        <createTable tableName="fixed_asset_net_book_value">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="fixed_asset_net_book_valuePK"/>
+            </column>
+            <column name="asset_category" type="VARCHAR(255)"/>
+            <column name="asset_description" type="VARCHAR(255)"/>
+            <column name="asset_number" type="BIGINT"/>
+            <column name="asset_tag" type="VARCHAR(255)"/>
+            <column name="compilation_token" type="VARCHAR(255)"/>
+            <column name="depreciation_regime" type="VARCHAR(255)"/>
+            <column name="file_upload_token" type="VARCHAR(255)"/>
+            <column name="net_book_value" type="numeric(21, 2)"/>
+            <column name="net_book_value_date" type="date"/>
+            <column name="service_outlet_code" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-6">
+        <createTable tableName="gha_authority">
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="gha_authorityPK"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-7">
+        <createTable tableName="gha_persistent_audit_event">
+            <column autoIncrement="true" name="event_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="gha_persistent_audit_eventPK"/>
+            </column>
+            <column name="event_date" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="event_type" type="VARCHAR(255)"/>
+            <column name="principal" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-8">
+        <createTable tableName="gha_persistent_audit_evt_data">
+            <column name="event_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="value" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-9">
+        <createTable tableName="gha_user">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="gha_userPK"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="activated" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="activation_key" type="VARCHAR(20)"/>
+            <column name="email" type="VARCHAR(254)"/>
+            <column name="first_name" type="VARCHAR(50)"/>
+            <column name="image_url" type="VARCHAR(256)"/>
+            <column name="lang_key" type="VARCHAR(10)"/>
+            <column name="last_name" type="VARCHAR(50)"/>
+            <column name="login" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reset_date" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="reset_key" type="VARCHAR(20)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-10">
+        <createTable tableName="gha_user_authority">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="authority_name" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-11">
+        <createTable tableName="leassets_file_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="leassets_file_typePK"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="file_template" type="BYTEA"/>
+            <column name="file_template_content_type" type="VARCHAR(255)"/>
+            <column name="leassets_file_medium_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="leassets_file_type_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="leassetsfile_type" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-12">
+        <createTable tableName="leassets_file_upload">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="leassets_file_uploadPK"/>
+            </column>
+            <column name="data_file" type="BYTEA">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_file_content_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="leassets_file_type_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period_from" type="date"/>
+            <column name="period_to" type="date"/>
+            <column name="upload_processed" type="BOOLEAN"/>
+            <column name="upload_successful" type="BOOLEAN"/>
+            <column name="upload_token" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-13">
+        <createTable tableName="leassets_message_token">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="leassets_message_tokenPK"/>
+            </column>
+            <column name="actioned" type="BOOLEAN"/>
+            <column name="content_fully_enqueued" type="BOOLEAN"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="received" type="BOOLEAN"/>
+            <column name="time_sent" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token_value" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-14">
+        <addUniqueConstraint columnNames="currency_code" constraintName="UC_CURRENCY_TABLECURRENCY_CODE_COL" tableName="currency_table"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-15">
+        <addUniqueConstraint columnNames="asset_number" constraintName="UC_FIXED_ASSET_ACQUISITIONASSET_NUMBER_COL" tableName="fixed_asset_acquisition"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-16">
+        <addUniqueConstraint columnNames="email" constraintName="UC_GHA_USEREMAIL_COL" tableName="gha_user"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-17">
+        <addUniqueConstraint columnNames="login" constraintName="UC_GHA_USERLOGIN_COL" tableName="gha_user"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-18">
+        <addUniqueConstraint columnNames="leassets_file_type_name" constraintName="UC_LEASSETS_FILE_TYPELEASSETS_FILE_TYPE_NAME_COL" tableName="leassets_file_type"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-19">
+        <addUniqueConstraint columnNames="file_name" constraintName="UC_LEASSETS_FILE_UPLOADFILE_NAME_COL" tableName="leassets_file_upload"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-20">
+        <addUniqueConstraint columnNames="upload_token" constraintName="UC_LEASSETS_FILE_UPLOADUPLOAD_TOKEN_COL" tableName="leassets_file_upload"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-21">
+        <addForeignKeyConstraint baseColumnNames="authority_name" baseTableName="gha_user_authority" constraintName="FK7vpii2smu77en3hw0ypiknl4r" deferrable="false" initiallyDeferred="false" referencedColumnNames="name" referencedTableName="gha_authority" validate="true"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-22">
+        <addForeignKeyConstraint baseColumnNames="event_id" baseTableName="gha_persistent_audit_evt_data" constraintName="FKj4lrxuk5snmvbbk82tjs767r0" deferrable="false" initiallyDeferred="false" referencedColumnNames="event_id" referencedTableName="gha_persistent_audit_event" validate="true"/>
+    </changeSet>
+    <changeSet author="edwin.njeru (generated)" id="1618492597891-23">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="gha_user_authority" constraintName="FKm0rqfeneuk5xl48iyj1hcp7p3" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="gha_user" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

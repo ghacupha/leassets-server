@@ -22,12 +22,6 @@
     <include file="config/liquibase/changelog/20210413071924_added_entity_LeassetsMessageToken.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20210413072024_added_entity_CurrencyTable.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20210414144226_added_springbatch_schema.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20210414144315_added_springbatch_schema.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20210414144352_added_springbatch_schema.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20210414144455_added_entity_LeassetsFileType.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20210414144555_added_entity_LeassetsFileUpload.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20210414144655_added_entity_LeassetsMessageToken.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20210414144755_added_entity_CurrencyTable.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
