@@ -1,5 +1,6 @@
 package io.github.leassets.internal.excel;
 
+import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
 import io.github.leassets.internal.model.sampleDataModel.CurrencyTableEVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,8 @@ import java.util.List;
 
 import static io.github.leassets.internal.excel.ExcelTestUtil.readFile;
 import static io.github.leassets.internal.excel.ExcelTestUtil.toBytes;
+import static io.github.leassets.internal.framework.AppConstants.DATETIME_FORMATTER;
+import static java.time.LocalDate.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
@@ -39,5 +42,32 @@ public class ExcelFileUtilsTest {
         assertThat(currencies.get(4)).isEqualTo(CurrencyTableEVM.builder().rowIndex(5).country("SWITZERLAND").currencyCode("CHF").currencyName("SWISS FRANC").locality("FOREIGN").build());
         assertThat(currencies.get(5)).isEqualTo(CurrencyTableEVM.builder().rowIndex(6).country("SOUTH AFRICA").currencyCode("ZAR").currencyName("SOUTH AFRICAN RAND").locality("FOREIGN").build());
         assertThat(currencies.get(12)).isEqualTo(CurrencyTableEVM.builder().rowIndex(13).country("CHINA").currencyCode("CNY").currencyName("CHINESE YUAN").locality("FOREIGN").build());
+    }
+
+    @Test
+    public void fixedAssetAcquisitionFile() throws Exception {
+        var deserializer = container.fixedAssetAcquisitionExcelFileDeserializer();
+
+        List<FixedAssetAcquisitionEVM> evms = deserializer.deserialize(toBytes(readFile("assetAcquisitionList.xlsx")));
+
+        assertThat(evms.size()).isEqualTo(13);
+
+        for (int i = 0; i < 13; i++) {
+            String index = String.valueOf(i + 1);
+            assertThat(evms.get(i))
+                .isEqualTo(
+                    FixedAssetAcquisitionEVM
+                        .builder()
+                        .rowIndex((long) (i + 1))
+                        .assetNumber((long) (i + 1))
+                        .serviceOutletCode("SOL_ID " + index)
+                        .assetTag("ASSET_TAG " + index)
+                        .assetDescription("ASSET_DESCRIPTION " + index)
+                        .purchaseDate(DATETIME_FORMATTER.format(of(2021, 1, 1).plusDays(Long.parseLong(index)).minusDays(1l)))
+                        .assetCategory("ASSET_CATEGORY " + index)
+                        .purchasePrice(1.1 + i)
+                        .build()
+                );
+        }
     }
 }

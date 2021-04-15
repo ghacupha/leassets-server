@@ -1,6 +1,7 @@
 package io.github.leassets.internal.excel;
 
 import io.github.leassets.internal.excel.deserializer.DefaultExcelFileDeserializer;
+import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
 import io.github.leassets.internal.model.sampleDataModel.CurrencyTableEVM;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,5 +19,8 @@ public class ExcelDeserializerContainer {
         return excelFile -> new DefaultExcelFileDeserializer<>(CurrencyTableEVM.class, getDefaultPoijiOptions()).deserialize(excelFile);
     }
 
-    // todo create bean for every data model
+    @Bean("fixedAssetAcquisitionExcelFileDeserializer")
+    public ExcelFileDeserializer<FixedAssetAcquisitionEVM> fixedAssetAcquisitionExcelFileDeserializer() {
+        return excelFile -> new DefaultExcelFileDeserializer<>(FixedAssetAcquisitionEVM.class, getDefaultPoijiOptions()).deserialize(excelFile);
+    }
 }

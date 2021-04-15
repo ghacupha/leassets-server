@@ -66,6 +66,14 @@ public class FileNotificationHandlingService implements HandlingService<FileNoti
         LeassetsFileUploadDTO fileUpload =
             fileUploadService.findOne(Long.parseLong(payload.getFileId())).orElseThrow(() -> new IllegalArgumentException("Id # : " + payload.getFileId() + " does not exist"));
 
+        saveFileUploadsData(payload, token, fileUpload);
+
+        LeassetsMessageTokenDTO dto = messageTokenService.save(messageToken);
+        dto.setContentFullyEnqueued(true);
+
+    }
+
+    private void saveFileUploadsData(FileNotification payload, String token, LeassetsFileUploadDTO fileUpload) {
         log.debug("FileUploadDTO object fetched from DB with id: {}", fileUpload.getId());
         if (!PROCESSED_TOKENS.contains(payload.getMessageToken())) {
             log.debug("Processing message with token {}", payload.getMessageToken());
@@ -79,10 +87,6 @@ public class FileNotificationHandlingService implements HandlingService<FileNoti
         } else {
             log.info("Skipped upload of processed files {}", payload.getFilename());
         }
-
-        LeassetsMessageTokenDTO dto = messageTokenService.save(messageToken);
-        dto.setContentFullyEnqueued(true);
-
     }
 
     private String getToken(FileNotification payload) {
