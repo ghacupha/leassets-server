@@ -2,14 +2,14 @@ package io.github.leassets.internal.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.leassets.domain.LeassetsMessageToken;
+import io.github.leassets.internal.framework.service.FileUploadPersistenceService;
+import io.github.leassets.internal.framework.service.HandlingService;
+import io.github.leassets.internal.framework.service.TokenPersistenceService;
 import io.github.leassets.internal.model.FileNotification;
 import io.github.leassets.internal.fileProcessing.FileUploadProcessorChain;
-import io.github.leassets.internal.util.TokenGenerator;
-import io.github.leassets.service.LeassetsFileUploadService;
-import io.github.leassets.service.LeassetsMessageTokenService;
+import io.github.leassets.internal.framework.util.TokenGenerator;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import io.github.leassets.service.dto.LeassetsMessageTokenDTO;
-import io.github.leassets.service.mapper.LeassetsMessageTokenMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static io.github.leassets.internal.AppConstants.PROCESSED_TOKENS;
+import static io.github.leassets.internal.framework.AppConstants.PROCESSED_TOKENS;
 
 /**
  * This is a service that handles file-notification asynchronously.
@@ -29,15 +29,13 @@ public class FileNotificationHandlingService implements HandlingService<FileNoti
     public static Logger log = LoggerFactory.getLogger(FileNotificationHandlingService.class);
 
     private final TokenGenerator tokenGenerator;
-    private final LeassetsMessageTokenService messageTokenService;
-    private final LeassetsMessageTokenMapper messageTokenMapper;
-    private final LeassetsFileUploadService fileUploadService;
+    private final TokenPersistenceService<LeassetsMessageTokenDTO, LeassetsMessageToken> messageTokenService;
+    private final FileUploadPersistenceService<LeassetsFileUploadDTO> fileUploadService;
     private final FileUploadProcessorChain fileUploadProcessorChain;
 
-    public FileNotificationHandlingService(TokenGenerator tokenGenerator, LeassetsMessageTokenService messageTokenService, LeassetsMessageTokenMapper messageTokenMapper, LeassetsFileUploadService fileUploadService, FileUploadProcessorChain fileUploadProcessorChain) {
+    public FileNotificationHandlingService(TokenGenerator tokenGenerator, TokenPersistenceService<LeassetsMessageTokenDTO, LeassetsMessageToken> messageTokenService, FileUploadPersistenceService<LeassetsFileUploadDTO> fileUploadService, FileUploadProcessorChain fileUploadProcessorChain) {
         this.tokenGenerator = tokenGenerator;
         this.messageTokenService = messageTokenService;
-        this.messageTokenMapper = messageTokenMapper;
         this.fileUploadService = fileUploadService;
         this.fileUploadProcessorChain = fileUploadProcessorChain;
     }
@@ -82,7 +80,7 @@ public class FileNotificationHandlingService implements HandlingService<FileNoti
             log.info("Skipped upload of processed files {}", payload.getFilename());
         }
 
-        LeassetsMessageTokenDTO dto = messageTokenService.save(messageTokenMapper.toDto(messageToken));
+        LeassetsMessageTokenDTO dto = messageTokenService.save(messageToken);
         dto.setContentFullyEnqueued(true);
 
     }

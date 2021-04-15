@@ -2,7 +2,7 @@ package io.github.leassets.internal.resource;
 
 import io.github.leassets.internal.model.FileNotification;
 import io.github.leassets.internal.resource.decorator.IFileUploadResource;
-import io.github.leassets.internal.service.HandlingService;
+import io.github.leassets.internal.framework.service.HandlingService;
 import io.github.leassets.domain.LeassetsFileType;
 import io.github.leassets.service.LeassetsFileTypeService;
 import io.github.leassets.service.dto.LeassetsFileUploadCriteria;

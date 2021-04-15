@@ -1,4 +1,4 @@
-package io.github.leassets.internal;
+package io.github.leassets.internal.framework;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

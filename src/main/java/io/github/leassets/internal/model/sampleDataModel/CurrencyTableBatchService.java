@@ -1,6 +1,6 @@
 package io.github.leassets.internal.model.sampleDataModel;
 
-import io.github.leassets.internal.service.BatchService;
+import io.github.leassets.internal.framework.BatchService;
 import io.github.leassets.service.dto.CurrencyTableDTO;
 import io.github.leassets.service.mapper.CurrencyTableMapper;
 import io.github.leassets.repository.CurrencyTableRepository;

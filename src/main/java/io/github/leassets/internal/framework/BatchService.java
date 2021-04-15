@@ -1,4 +1,4 @@
-package io.github.leassets.internal.service;
+package io.github.leassets.internal.framework;
 
 import java.util.List;
 

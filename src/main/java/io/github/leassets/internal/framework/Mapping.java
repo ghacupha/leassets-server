@@ -1,4 +1,4 @@
-package io.github.leassets.internal;
+package io.github.leassets.internal.framework;
 
 import com.google.common.collect.ImmutableList;
 
@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * This is a general interface for mapping one type of entity or data transfer object
  * <p/>
- * into another commonly used with mapstruct. So here we are also assuming client code to 
+ * into another commonly used with mapstruct. So here we are also assuming client code to
  * <p/>
  * mapstruct configurations at the ready
  */

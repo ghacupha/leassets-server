@@ -1,4 +1,4 @@
-package io.github.leassets.internal.util;
+package io.github.leassets.internal.framework.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,7 +11,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-import static io.github.leassets.internal.AppConstants.TOKEN_BYTE_LENGTH;
+import static io.github.leassets.internal.framework.AppConstants.TOKEN_BYTE_LENGTH;
 
 
 /**

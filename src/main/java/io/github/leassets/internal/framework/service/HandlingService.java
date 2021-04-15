@@ -1,4 +1,4 @@
-package io.github.leassets.internal.service;
+package io.github.leassets.internal.framework.service;
 
 /**
  * This service the uploaded file in whatever way that is deemed necessary.

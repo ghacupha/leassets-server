@@ -1,6 +1,6 @@
 package io.github.leassets.internal.model.sampleDataModel;
 
-import io.github.leassets.internal.Mapping;
+import io.github.leassets.internal.framework.Mapping;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import io.github.leassets.service.dto.CurrencyTableDTO;
