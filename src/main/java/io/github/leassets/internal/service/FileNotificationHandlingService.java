@@ -6,7 +6,7 @@ import io.github.leassets.internal.framework.service.FileUploadPersistenceServic
 import io.github.leassets.internal.framework.service.HandlingService;
 import io.github.leassets.internal.framework.service.TokenPersistenceService;
 import io.github.leassets.internal.model.FileNotification;
-import io.github.leassets.internal.fileProcessing.FileUploadProcessorChain;
+import io.github.leassets.internal.framework.fileProcessing.FileUploadProcessorChain;
 import io.github.leassets.internal.framework.util.TokenGenerator;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import io.github.leassets.service.dto.LeassetsMessageTokenDTO;

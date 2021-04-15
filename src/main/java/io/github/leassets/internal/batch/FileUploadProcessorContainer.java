@@ -1,5 +1,7 @@
-package io.github.leassets.internal.fileProcessing;
+package io.github.leassets.internal.batch;
 
+import io.github.leassets.internal.framework.fileProcessing.BatchSupportedFileUploadProcessor;
+import io.github.leassets.internal.framework.fileProcessing.FileUploadProcessorChain;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 // todo loop for every file model type
 import static io.github.leassets.domain.enumeration.LeassetsFileModelType.CURRENCY_LIST;
+import static io.github.leassets.domain.enumeration.LeassetsFileModelType.FIXED_ASSET_ACQUISITION;
 
 /**
  * This object maintains a list of all existing processors. This is a short in the dark about automatically configuring the chain at start up
@@ -24,6 +27,14 @@ public class FileUploadProcessorContainer {
     @Qualifier("currencyTablePersistenceJob")
     private Job currencyTablePersistenceJob;
 
+    @Autowired
+    @Qualifier("fixedAssetAcquisitionListPersistenceJob")
+    private Job fixedAssetAcquisitionListPersistenceJob;
+
+    @Autowired
+    @Qualifier("fixedAssetAcquisitionListDeletionJob")
+    private Job fixedAssetAcquisitionListDeletionJob;
+
     @Bean("fileUploadProcessorChain")
     public FileUploadProcessorChain fileUploadProcessorChain() {
 
@@ -31,13 +42,8 @@ public class FileUploadProcessorContainer {
 
         // Create the chain, each should match against it's specific key of data-model type
         theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, currencyTablePersistenceJob, CURRENCY_LIST));
-
-        // TODO Add processors for each data model type
-        //theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, schemeTablePersistenceJob, SCHEME_LIST));
-        //theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, branchTablePersistenceJob, BRANCH_LIST));
-        //theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, sbuTablePersistenceJob, SBU_LIST));
-        //theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, typeTablePersistenceJob, GENERAL_LEDGERS));
-        //theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, depositAccountPersistenceJob, DEPOSIT_LIST));
+        theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetAcquisitionListPersistenceJob, FIXED_ASSET_ACQUISITION));
+        theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetAcquisitionListDeletionJob, FIXED_ASSET_ACQUISITION));
 
         return theChain;
     }

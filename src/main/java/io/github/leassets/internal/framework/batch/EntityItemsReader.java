@@ -18,7 +18,7 @@ package io.github.leassets.internal.framework.batch;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import io.github.leassets.internal.excel.ExcelFileDeserializer;
+import io.github.leassets.internal.framework.excel.ExcelFileDeserializer;
 import io.github.leassets.internal.framework.FileUploadsProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

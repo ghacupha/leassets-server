@@ -1,4 +1,4 @@
-package io.github.leassets.internal.fileProcessing;
+package io.github.leassets.internal.framework.fileProcessing;
 
 import com.google.common.collect.ImmutableList;
 import io.github.leassets.internal.model.FileNotification;

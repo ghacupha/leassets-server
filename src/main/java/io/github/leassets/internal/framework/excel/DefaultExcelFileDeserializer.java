@@ -1,4 +1,4 @@
-package io.github.leassets.internal.excel.deserializer;
+package io.github.leassets.internal.framework.excel;
 
 import com.poiji.bind.Poiji;
 import com.poiji.exception.PoijiExcelType;
@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import java.io.InputStream;
 import java.util.List;
 
-import static io.github.leassets.internal.excel.deserializer.DeserializationUtils.getFileInputStream;
+import static io.github.leassets.internal.framework.excel.DeserializationUtils.getFileInputStream;
 
 /**
  * This is the default configuration for excel deserialization for an excel view model of type T

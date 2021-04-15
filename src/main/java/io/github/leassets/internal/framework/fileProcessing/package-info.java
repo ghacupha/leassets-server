@@ -2,4 +2,4 @@
  * Package contains an implementation of file processing for each data model type described
  * in the data type
  */
-package io.github.leassets.internal.fileProcessing;
+package io.github.leassets.internal.framework.fileProcessing;

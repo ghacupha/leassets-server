@@ -1,4 +1,4 @@
-package io.github.leassets.internal.excel;
+package io.github.leassets.internal.framework.excel;
 
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;

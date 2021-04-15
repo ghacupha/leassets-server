@@ -18,21 +18,15 @@
 package io.github.leassets.internal.batch.fixedAssetAcquisition;
 
 import com.google.common.collect.ImmutableList;
-import io.github.leassets.domain.LeassetsFileUpload;
-import io.github.leassets.domain.LeassetsMessageToken;
 import io.github.leassets.internal.framework.FileUploadsProperties;
 import io.github.leassets.domain.FixedAssetAcquisition;
-import io.github.leassets.internal.excel.ExcelFileDeserializer;
+import io.github.leassets.internal.framework.excel.ExcelFileDeserializer;
 import io.github.leassets.internal.framework.BatchService;
 import io.github.leassets.internal.framework.Mapping;
 import io.github.leassets.internal.framework.batch.*;
 import io.github.leassets.internal.framework.service.DeletionUploadService;
-import io.github.leassets.internal.framework.service.FileUploadPersistenceService;
-import io.github.leassets.internal.framework.service.TokenPersistenceService;
 import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
 import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
-import io.github.leassets.service.dto.LeassetsFileUploadDTO;
-import io.github.leassets.service.dto.LeassetsMessageTokenDTO;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;

@@ -1,4 +1,4 @@
-package io.github.leassets.internal.fileProcessing;
+package io.github.leassets.internal.framework.fileProcessing;
 
 import io.github.leassets.service.dto.LeassetsMessageTokenDTO;
 

@@ -1,5 +1,6 @@
-package io.github.leassets.internal.fileProcessing;
+package io.github.leassets.internal.service;
 
+import io.github.leassets.internal.framework.fileProcessing.TokenValueSearch;
 import io.github.leassets.service.LeassetsMessageTokenQueryService;
 import io.github.leassets.service.dto.LeassetsMessageTokenCriteria;
 import io.github.leassets.service.dto.LeassetsMessageTokenDTO;

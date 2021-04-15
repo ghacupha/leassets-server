@@ -1,4 +1,4 @@
-package io.github.leassets.internal.excel.deserializer;
+package io.github.leassets.internal.framework.excel;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
