@@ -1,4 +1,4 @@
-package io.github.leassets.internal.model;
+package io.github.leassets.internal.framework.model;
 
 import java.io.Serializable;
 

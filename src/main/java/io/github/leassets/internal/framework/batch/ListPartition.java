@@ -1,4 +1,4 @@
-package io.github.leassets.internal.batch;
+package io.github.leassets.internal.framework.batch;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;

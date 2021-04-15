@@ -1,6 +1,7 @@
 package io.github.leassets.internal.model;
 
 import io.github.leassets.domain.enumeration.LeassetsFileModelType;
+import io.github.leassets.internal.framework.model.TokenizableMessage;
 
 /**
  * This is a notification which contains metadata of a recently uploaded which a listener might act upon

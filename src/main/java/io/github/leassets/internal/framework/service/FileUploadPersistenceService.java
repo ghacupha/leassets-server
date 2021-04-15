@@ -1,5 +1,7 @@
 package io.github.leassets.internal.framework.service;
 
+import io.github.leassets.internal.framework.batch.HasDataFile;
+
 import java.util.Optional;
 
 /**

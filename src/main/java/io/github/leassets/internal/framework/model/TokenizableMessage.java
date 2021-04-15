@@ -1,4 +1,4 @@
-package io.github.leassets.internal.model;
+package io.github.leassets.internal.framework.model;
 
 /**
  * This is a message that is tokenizable that contains description and timestamp as well

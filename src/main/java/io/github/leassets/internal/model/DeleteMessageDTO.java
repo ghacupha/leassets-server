@@ -1,5 +1,7 @@
 package io.github.leassets.internal.model;
 
+import io.github.leassets.internal.framework.model.TokenizableMessage;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 

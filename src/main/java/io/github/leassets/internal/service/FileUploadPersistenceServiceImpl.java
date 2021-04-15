@@ -1,5 +1,6 @@
 package io.github.leassets.internal.service;
 
+import io.github.leassets.internal.framework.batch.HasDataFile;
 import io.github.leassets.internal.framework.service.FileUploadPersistenceService;
 import io.github.leassets.service.LeassetsFileUploadService;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;

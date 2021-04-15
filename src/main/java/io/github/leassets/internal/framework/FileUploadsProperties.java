@@ -1,5 +1,6 @@
-package io.github.leassets.config;
+package io.github.leassets.internal.framework;
 
+import io.github.leassets.config.FileUploadsPropertyFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
