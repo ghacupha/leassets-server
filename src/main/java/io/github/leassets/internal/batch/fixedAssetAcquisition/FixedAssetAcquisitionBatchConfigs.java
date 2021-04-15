@@ -24,8 +24,10 @@ import io.github.leassets.internal.excel.ExcelFileDeserializer;
 import io.github.leassets.internal.framework.BatchService;
 import io.github.leassets.internal.framework.Mapping;
 import io.github.leassets.internal.framework.batch.BatchPersistentFileUploadService;
+import io.github.leassets.internal.framework.batch.DeletionService;
 import io.github.leassets.internal.framework.batch.EntityItemsReader;
 import io.github.leassets.internal.framework.service.FileUploadPersistenceService;
+import io.github.leassets.internal.framework.service.TokenPersistenceService;
 import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
 import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
@@ -93,7 +95,7 @@ public class FixedAssetAcquisitionBatchConfigs {
     private Mapping<FixedAssetAcquisitionEVM, FixedAssetAcquisitionDTO> mapping;
 
     @Autowired
-    private FileUploadTokenService<FixedAssetAcquisitionDTO> fileUploadTokenService;
+    private TokenPersistenceService<FixedAssetAcquisitionDTO, FixedAssetAcquisition> fileUploadTokenService;
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
