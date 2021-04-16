@@ -38,6 +38,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,9 +75,11 @@ public class FixedAssetAcquisitionBatchConfigs {
     private FileUploadsProperties fileUploadsProperties;
 
     @Autowired
+    @Qualifier("persistenceJobListener")
     private JobExecutionListener persistenceJobListener;
 
     @Autowired
+    @Qualifier("deletionJobListener")
     private JobExecutionListener deletionJobListener;
 
     @Autowired
@@ -175,6 +178,6 @@ public class FixedAssetAcquisitionBatchConfigs {
 
     @Bean(DELETION_WRITER_NAME)
     public ItemWriter<? super List<FixedAssetAcquisition>> deletionWriter() {
-        return guarantees -> {};
+        return deletables -> {};
     }
 }
