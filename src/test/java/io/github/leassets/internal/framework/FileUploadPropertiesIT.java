@@ -1,10 +1,14 @@
-package io.github.leassets.config;
+package io.github.leassets.internal.framework;
 
 import io.github.leassets.LeassetsServerApp;
 import io.github.leassets.internal.framework.FileUploadsProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
+
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,6 +23,6 @@ public class FileUploadPropertiesIT {
 
     @Test
     public void whenFactoryProvidedThenYamlPropertiesInjected() {
-        assertThat(fileUploadsProperties.getListSize()).isEqualTo(5);
+        assertThat(fileUploadsProperties.getListSize()).isEqualTo(1500);
     }
 }
