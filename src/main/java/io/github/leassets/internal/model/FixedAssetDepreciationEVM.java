@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
 @Builder
@@ -36,13 +34,13 @@ public class FixedAssetDepreciationEVM implements Serializable, ExcelViewModel<F
     private String assetDescription;
 
     @ExcelCell(4)
-    private LocalDate depreciationDate;
+    private String depreciationDate;
 
     @ExcelCell(5)
     private String assetCategory;
 
     @ExcelCell(6)
-    private BigDecimal depreciationAmount;
+    private double depreciationAmount;
 
     @ExcelCell(7)
     private DepreciationRegime depreciationRegime;
