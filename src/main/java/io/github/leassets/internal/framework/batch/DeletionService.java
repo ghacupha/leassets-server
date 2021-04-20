@@ -18,6 +18,7 @@ package io.github.leassets.internal.framework.batch;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * This service deletes items in batch and returns a list of the deleted objects
@@ -29,5 +30,5 @@ public interface DeletionService<DTO> {
      * @param list of ids of objects to delete
      * @return List of deleted and detached objects
      */
-    List<DTO> delete(List<Long> list);
+    Future<List<DTO>> delete(List<Long> list);
 }

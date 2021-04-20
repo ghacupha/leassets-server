@@ -30,13 +30,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service("leassetsDeletionFileUploadService")
-public class LeassetsDeletionFileUploadService implements DeletionUploadService<FixedAssetAcquisitionDTO> {
+@Service("fixedAssetAcquisitionDeletionFileUploadService")
+public class FixedAssetAcquisitionDeletionFileUploadService implements DeletionUploadService<FixedAssetAcquisitionDTO> {
 
     private final LeassetsFileUploadService leassetsFileUploadService;
     private final FixedAssetAcquisitionQueryService fixedAssetAcquisitionQueryService;
 
-    public LeassetsDeletionFileUploadService(LeassetsFileUploadService leassetsFileUploadService, FixedAssetAcquisitionQueryService fixedAssetAcquisitionQueryService) {
+    public FixedAssetAcquisitionDeletionFileUploadService(LeassetsFileUploadService leassetsFileUploadService, FixedAssetAcquisitionQueryService fixedAssetAcquisitionQueryService) {
         this.leassetsFileUploadService = leassetsFileUploadService;
         this.fixedAssetAcquisitionQueryService = fixedAssetAcquisitionQueryService;
     }

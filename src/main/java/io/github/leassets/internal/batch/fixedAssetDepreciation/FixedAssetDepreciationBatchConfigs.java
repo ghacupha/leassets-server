@@ -1,33 +1,23 @@
-
-/*-
- * Leassets Server - Leases and assets management platform
- * Copyright © 2021 Edwin Njeru (mailnjeru@gmail.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-package io.github.leassets.internal.batch.fixedAssetAcquisition;
+package io.github.leassets.internal.batch.fixedAssetDepreciation;
 
 import com.google.common.collect.ImmutableList;
-import io.github.leassets.internal.framework.FileUploadsProperties;
-import io.github.leassets.domain.FixedAssetAcquisition;
-import io.github.leassets.internal.framework.excel.ExcelFileDeserializer;
+import io.github.leassets.domain.FixedAssetDepreciation;
 import io.github.leassets.internal.framework.BatchService;
+import io.github.leassets.internal.framework.FileUploadsProperties;
 import io.github.leassets.internal.framework.Mapping;
-import io.github.leassets.internal.framework.batch.*;
+import io.github.leassets.internal.framework.batch.BatchPersistentFileUploadService;
+import io.github.leassets.internal.framework.batch.DataDeletionStep;
+import io.github.leassets.internal.framework.batch.DeletionService;
+import io.github.leassets.internal.framework.batch.EntityDeletionProcessor;
+import io.github.leassets.internal.framework.batch.EntityItemsDeletionReader;
+import io.github.leassets.internal.framework.batch.EntityItemsReader;
+import io.github.leassets.internal.framework.batch.EntityListItemsWriter;
+import io.github.leassets.internal.framework.batch.ReadFileStep;
+import io.github.leassets.internal.framework.batch.SingleStepEntityJob;
+import io.github.leassets.internal.framework.excel.ExcelFileDeserializer;
 import io.github.leassets.internal.framework.service.DeletionUploadService;
-import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
-import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
+import io.github.leassets.internal.model.FixedAssetDepreciationEVM;
+import io.github.leassets.service.dto.FixedAssetDepreciationDTO;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -45,25 +35,19 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-/**
- * This java-based configuration has been designed to be as general as possible with all
- * static string names placed at the top. This is to facilitate reuse for other entities.
- * Where it's not possible to create an abstract configuration at lease this class
- * can be considered a well done template for the others to adhere to.
- */
 @Configuration
-public class FixedAssetAcquisitionBatchConfigs {
+public class FixedAssetDepreciationBatchConfigs {
 
-    private static final String PERSISTENCE_JOB_NAME = "fixedAssetAcquisitionListPersistenceJob";
-    private static final String DELETION_JOB_NAME = "fixedAssetAcquisitionListDeletionJob";
-    private static final String READ_FILE_STEP_NAME = "readFixedAssetAcquisitionListFromFile";
-    private static final String DELETION_STEP_NAME = "deleteFixedAssetAcquisitionListFromFile";
-    private static final String DELETION_PROCESSOR_NAME = "fixedAssetAcquisitionDeletionProcessor";
-    private static final String DELETION_WRITER_NAME = "fixedAssetAcquisitionDeletionWriter";
+    private static final String PERSISTENCE_JOB_NAME = "fixedAssetDepreciationListPersistenceJob";
+    private static final String DELETION_JOB_NAME = "fixedAssetDepreciationListDeletionJob";
+    private static final String READ_FILE_STEP_NAME = "readFixedAssetDepreciationListFromFile";
+    private static final String DELETION_STEP_NAME = "deleteFixedAssetDepreciationListFromFile";
+    private static final String DELETION_PROCESSOR_NAME = "fixedAssetDepreciationDeletionProcessor";
+    private static final String DELETION_WRITER_NAME = "fixedAssetDepreciationDeletionWriter";
     private static final String DELETION_READER_NAME = "fixedAssetsAcquisitionDeletionReader";
-    private static final String PERSISTENCE_READER_NAME = "fixedAssetAcquisitionListItemReader";
+    private static final String PERSISTENCE_READER_NAME = "fixedAssetDepreciationListItemReader";
     private static final String PERSISTENCE_PROCESSOR_NAME = "fixedAssetsAcquisitionListItemProcessor";
-    private static final String PERSISTENCE_WRITER_NAME = "fixedAssetAcquisitionEntityListItemsWriter";
+    private static final String PERSISTENCE_WRITER_NAME = "fixedAssetDepreciationEntityListItemsWriter";
 
     @SuppressWarnings("SpringElStaticFieldInjectionInspection")
     @Value("#{jobParameters['fileId']}")
@@ -85,16 +69,16 @@ public class FixedAssetAcquisitionBatchConfigs {
     private JobExecutionListener deletionJobListener;
 
     @Autowired
-    private ExcelFileDeserializer<FixedAssetAcquisitionEVM> fixedAssetAcquisitionDeserializer;
+    private ExcelFileDeserializer<FixedAssetDepreciationEVM> fixedAssetDepreciationDeserializer;
 
     @Autowired
-    private BatchService<FixedAssetAcquisitionDTO> batchService;
+    private BatchService<FixedAssetDepreciationDTO> batchService;
 
     @Autowired
-    private DeletionService<FixedAssetAcquisition> fixedAssetAcquisitionDeletionService;
+    private DeletionService<FixedAssetDepreciation> fixedAssetDepreciationDeletionService;
 
     @Autowired
-    private Mapping<FixedAssetAcquisitionEVM, FixedAssetAcquisitionDTO> mapping;
+    private Mapping<FixedAssetDepreciationEVM, FixedAssetDepreciationDTO> mapping;
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -106,19 +90,19 @@ public class FixedAssetAcquisitionBatchConfigs {
     private BatchPersistentFileUploadService fileUploadService;
 
     @Autowired
-    private DeletionUploadService<FixedAssetAcquisitionDTO> fileUploadDeletionService;
+    private DeletionUploadService<FixedAssetDepreciationDTO> fileUploadDeletionService;
 
     @Bean(PERSISTENCE_READER_NAME)
     @JobScope
-    public EntityItemsReader<FixedAssetAcquisitionEVM> listItemReader(
+    public EntityItemsReader<FixedAssetDepreciationEVM> listItemReader(
         @Value("#{jobParameters['fileId']}") long fileId
     ) {
-        return new EntityItemsReader<>(fixedAssetAcquisitionDeserializer, fileUploadService, fileId, fileUploadsProperties);
+        return new EntityItemsReader<>(fixedAssetDepreciationDeserializer, fileUploadService, fileId, fileUploadsProperties);
     }
 
     @Bean(PERSISTENCE_PROCESSOR_NAME)
     @JobScope
-    public ItemProcessor<List<FixedAssetAcquisitionEVM>, List<FixedAssetAcquisitionDTO>> listItemsProcessor(
+    public ItemProcessor<List<FixedAssetDepreciationEVM>, List<FixedAssetDepreciationDTO>> listItemsProcessor(
         @Value("#{jobParameters['messageToken']}") String jobUploadToken
     ) {
         return evms ->
@@ -127,7 +111,7 @@ public class FixedAssetAcquisitionBatchConfigs {
 
     @Bean(PERSISTENCE_WRITER_NAME)
     @JobScope
-    public EntityListItemsWriter<FixedAssetAcquisitionDTO> listItemsWriter() {
+    public EntityListItemsWriter<FixedAssetDepreciationDTO> listItemsWriter() {
         return new EntityListItemsWriter<>(batchService);
     }
 
@@ -147,13 +131,13 @@ public class FixedAssetAcquisitionBatchConfigs {
         return new SingleStepEntityJob(PERSISTENCE_JOB_NAME, persistenceJobListener, readFile(), jobBuilderFactory);
     }
 
-    // fixedAssetAcquisitionDeletionJob
+    // fixedAssetDepreciationDeletionJob
     @Bean(DELETION_JOB_NAME)
-    public Job fixedAssetAcquisitionDeletionJob() {
+    public Job fixedAssetDepreciationDeletionJob() {
         return new SingleStepEntityJob(DELETION_JOB_NAME, deletionJobListener, deleteEntityListFromFile(), jobBuilderFactory);
     }
 
-    // deleteFixedAssetAcquisitionListFromFile step
+    // deleteFixedAssetDepreciationListFromFile step
     @Bean(DELETION_STEP_NAME)
     public Step deleteEntityListFromFile() {
         return new DataDeletionStep<>(
@@ -174,12 +158,12 @@ public class FixedAssetAcquisitionBatchConfigs {
     }
 
     @Bean(DELETION_PROCESSOR_NAME)
-    public ItemProcessor<List<Long>, List<FixedAssetAcquisition>> deletionProcessor() {
-        return new EntityDeletionProcessor<>(fixedAssetAcquisitionDeletionService);
+    public ItemProcessor<List<Long>, List<FixedAssetDepreciation>> deletionProcessor() {
+        return new EntityDeletionProcessor<>(fixedAssetDepreciationDeletionService);
     }
 
     @Bean(DELETION_WRITER_NAME)
-    public ItemWriter<? super List<FixedAssetAcquisition>> deletionWriter() {
+    public ItemWriter<? super List<FixedAssetDepreciation>> deletionWriter() {
         return deletables -> {};
     }
 }

@@ -22,6 +22,9 @@ import org.slf4j.Logger;
 import org.springframework.batch.item.ItemProcessor;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -41,6 +44,7 @@ public class EntityDeletionProcessor<Entity> implements ItemProcessor<List<Long>
     @Override
     public List<Entity> process(final List<Long> list) throws Exception {
         log.debug("Deletion processor iterating over {} deletion item ids", list.size());
-        return deletionService.delete(list);
+        // TODO THIS FUTURES THING PROBABLY A MISTAKE PLS REMOVE OR ENHANCE
+        return deletionService.delete(list).get();
     }
 }

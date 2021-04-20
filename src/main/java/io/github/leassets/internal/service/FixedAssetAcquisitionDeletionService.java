@@ -18,14 +18,18 @@ package io.github.leassets.internal.service;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.google.common.util.concurrent.Futures;
 import io.github.jhipster.service.filter.LongFilter;
 import io.github.leassets.domain.FixedAssetAcquisition;
+import io.github.leassets.domain.FixedAssetDepreciation;
 import io.github.leassets.internal.framework.batch.DeletionService;
 import io.github.leassets.repository.FixedAssetAcquisitionRepository;
 import io.github.leassets.repository.search.FixedAssetAcquisitionSearchRepository;
 import io.github.leassets.service.FixedAssetAcquisitionQueryService;
+import io.github.leassets.service.FixedAssetDepreciationQueryService;
 import io.github.leassets.service.dto.FixedAssetAcquisitionCriteria;
 import io.github.leassets.service.dto.FixedAssetAcquisitionDTO;
+import io.github.leassets.service.dto.FixedAssetDepreciationCriteria;
 import io.github.leassets.service.mapper.EntityMapper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -34,12 +38,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 @Transactional
 @Service
 public class FixedAssetAcquisitionDeletionService implements DeletionService<FixedAssetAcquisition> {
-
 
     private final FixedAssetAcquisitionRepository fixedAssetAcquisitionRepository;
     private final FixedAssetAcquisitionSearchRepository fixedAssetAcquisitionSearchRepository;
@@ -66,7 +70,7 @@ public class FixedAssetAcquisitionDeletionService implements DeletionService<Fix
      */
     @Override
     @Async
-    public List<FixedAssetAcquisition> delete(final List<Long> list) {
+    public Future<List<FixedAssetAcquisition>> delete(final List<Long> list) {
         List<FixedAssetAcquisition> deletedAccounts = new CopyOnWriteArrayList<>();
 
         Optional<List<FixedAssetAcquisition>> deletable = Optional.of(new CopyOnWriteArrayList<>());
@@ -83,19 +87,7 @@ public class FixedAssetAcquisitionDeletionService implements DeletionService<Fix
             }
         );
 
-        criteriaList.forEach(
-            criteria ->
-                deletable.ifPresent(
-                    toDelete ->
-                        toDelete.addAll(
-                            fixedAssetAcquisitionQueryService
-                                .findByCriteria(criteria)
-                                .stream()
-                                .map(fixedAssetAcquisitionMapper::toEntity)
-                                .collect(Collectors.toList())
-                        )
-                )
-        );
+        mapCriteriaList(deletable, criteriaList, fixedAssetAcquisitionQueryService);
 
         deletable.ifPresent(deletedAccounts::addAll);
 
@@ -112,6 +104,22 @@ public class FixedAssetAcquisitionDeletionService implements DeletionService<Fix
                 )
         );
 
-        return deletedAccounts;
+        return Futures.immediateFuture(deletedAccounts);
+    }
+
+    public void mapCriteriaList(Optional<List<FixedAssetAcquisition>> deletable, List<FixedAssetAcquisitionCriteria> criteriaList, FixedAssetAcquisitionQueryService fixedAssetAcquisitionQueryService) {
+        criteriaList.forEach(
+            criteria ->
+                deletable.ifPresent(
+                    toDelete ->
+                        toDelete.addAll(
+                            fixedAssetAcquisitionQueryService
+                                .findByCriteria(criteria)
+                                .stream()
+                                .map(fixedAssetAcquisitionMapper::toEntity)
+                                .collect(Collectors.toList())
+                        )
+                )
+        );
     }
 }
