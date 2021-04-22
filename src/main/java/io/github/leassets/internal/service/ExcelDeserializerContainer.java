@@ -22,6 +22,7 @@ import io.github.leassets.internal.framework.excel.ExcelFileDeserializer;
 import io.github.leassets.internal.framework.excel.DefaultExcelFileDeserializer;
 import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
 import io.github.leassets.internal.model.FixedAssetDepreciationEVM;
+import io.github.leassets.internal.model.FixedAssetNetBookValueEVM;
 import io.github.leassets.internal.model.sampleDataModel.CurrencyTableEVM;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,5 +48,10 @@ public class ExcelDeserializerContainer {
     @Bean("fixedAssetDepreciationExcelFileDeserializer")
     public ExcelFileDeserializer<FixedAssetDepreciationEVM> fixedAssetDepreciationExcelFileDeserializer() {
         return excelFile -> new DefaultExcelFileDeserializer<>(FixedAssetDepreciationEVM.class, getDefaultPoijiOptions()).deserialize(excelFile);
+    }
+
+    @Bean("fixedAssetNetBookValueExcelFileDeserializer")
+    public ExcelFileDeserializer<FixedAssetNetBookValueEVM> fixedAssetNetBookValueExcelFileDeserializer() {
+        return excelFile -> new DefaultExcelFileDeserializer<>(FixedAssetNetBookValueEVM.class, getDefaultPoijiOptions()).deserialize(excelFile);
     }
 }

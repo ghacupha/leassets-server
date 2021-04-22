@@ -20,20 +20,16 @@ package io.github.leassets.internal.model;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelRow;
-import io.github.leassets.internal.framework.ExcelViewModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.SerializationUtils;
-
-import java.io.Serializable;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FixedAssetDepreciationEVM implements Serializable, ExcelViewModel<FixedAssetDepreciationEVM> {
+public class FixedAssetNetBookValueEVM {
 
     @ExcelRow
     private Long rowIndex;
@@ -51,13 +47,13 @@ public class FixedAssetDepreciationEVM implements Serializable, ExcelViewModel<F
     private String assetDescription;
 
     @ExcelCell(4)
-    private String depreciationDate;
+    private String netBookValueDate;
 
     @ExcelCell(5)
     private String assetCategory;
 
     @ExcelCell(6)
-    private double depreciationAmount;
+    private double netBookValue;
 
     @ExcelCell(7)
     private String depreciationRegime;
@@ -65,9 +61,4 @@ public class FixedAssetDepreciationEVM implements Serializable, ExcelViewModel<F
     private String fileUploadToken;
 
     private String compilationToken;
-
-    @Override
-    public FixedAssetDepreciationEVM getModelData() {
-        return SerializationUtils.clone(this);
-    }
 }

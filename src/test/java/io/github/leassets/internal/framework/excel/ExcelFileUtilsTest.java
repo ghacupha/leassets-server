@@ -19,6 +19,8 @@ package io.github.leassets.internal.framework.excel;
  */
 
 import io.github.leassets.internal.model.FixedAssetAcquisitionEVM;
+import io.github.leassets.internal.model.FixedAssetDepreciationEVM;
+import io.github.leassets.internal.model.FixedAssetNetBookValueEVM;
 import io.github.leassets.internal.model.sampleDataModel.CurrencyTableEVM;
 import io.github.leassets.internal.service.ExcelDeserializerContainer;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,9 +83,65 @@ public class ExcelFileUtilsTest {
                         .serviceOutletCode("SOL_ID " + index)
                         .assetTag("ASSET_TAG " + index)
                         .assetDescription("ASSET_DESCRIPTION " + index)
-                        .purchaseDate(DATETIME_FORMATTER.format(of(2021, 1, 1).plusDays(Long.parseLong(index)).minusDays(1l)))
+                        .purchaseDate(DATETIME_FORMATTER.format(of(2021, 1, 1).plusDays(Long.parseLong(index)).minusDays(1L)))
                         .assetCategory("ASSET_CATEGORY " + index)
                         .purchasePrice(1.1 + i)
+                        .build()
+                );
+        }
+    }
+
+    @Test
+    public void fixedAssetDepreciationListFile() throws Exception {
+        var deserializer = container.fixedAssetDepreciationExcelFileDeserializer();
+
+        List<FixedAssetDepreciationEVM> evms = deserializer.deserialize(toBytes(readFile("assetDepreciationList.xlsx")));
+
+        assertThat(evms.size()).isEqualTo(13);
+
+        for (int i = 0; i < 13; i++) {
+            String index = String.valueOf(i + 1);
+            assertThat(evms.get(i))
+                .isEqualTo(
+                    FixedAssetDepreciationEVM
+                        .builder()
+                        .rowIndex((long) (i + 1))
+                        .assetNumber((long) (i + 1))
+                        .serviceOutletCode("SOL_ID " + index)
+                        .assetTag("ASSET_TAG " + index)
+                        .assetDescription("ASSET_DESCRIPTION " + index)
+                        .depreciationDate(DATETIME_FORMATTER.format(of(2021, 1, 1).plusDays(Long.parseLong(index)).minusDays(1L)))
+                        .assetCategory("ASSET_CATEGORY " + index)
+                        .depreciationAmount(1.1 + i)
+                        .depreciationRegime("DEPRECIATION REGIME " + index)
+                        .build()
+                );
+        }
+    }
+
+    @Test
+    public void fixedAssetNetBookValueListFile() throws Exception {
+        var deserializer = container.fixedAssetNetBookValueExcelFileDeserializer();
+
+        List<FixedAssetNetBookValueEVM> evms = deserializer.deserialize(toBytes(readFile("assetNetBookValue.xlsx")));
+
+        assertThat(evms.size()).isEqualTo(13);
+
+        for (int i = 0; i < 13; i++) {
+            String index = String.valueOf(i + 1);
+            assertThat(evms.get(i))
+                .isEqualTo(
+                    FixedAssetNetBookValueEVM
+                        .builder()
+                        .rowIndex((long) (i + 1))
+                        .assetNumber((long) (i + 1))
+                        .serviceOutletCode("SOL_ID " + index)
+                        .assetTag("ASSET_TAG " + index)
+                        .assetDescription("ASSET_DESCRIPTION " + index)
+                        .netBookValueDate(DATETIME_FORMATTER.format(of(2021, 1, 1).plusDays(Long.parseLong(index)).minusDays(1L)))
+                        .assetCategory("ASSET_CATEGORY " + index)
+                        .netBookValue(1.1 + i)
+                        .depreciationRegime("DEPRECIATION REGIME " + index)
                         .build()
                 );
         }

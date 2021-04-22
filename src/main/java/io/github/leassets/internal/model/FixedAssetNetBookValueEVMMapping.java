@@ -21,31 +21,31 @@ package io.github.leassets.internal.model;
 import io.github.leassets.domain.enumeration.DepreciationRegime;
 import io.github.leassets.internal.framework.MapUtils;
 import io.github.leassets.internal.framework.Mapping;
-import io.github.leassets.service.dto.FixedAssetDepreciationDTO;
+import io.github.leassets.service.dto.FixedAssetNetBookValueDTO;
 import org.mapstruct.Mapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Mapper(componentModel = "spring")
-public interface FixedAssetDepreciationEVMMapping extends Mapping<FixedAssetDepreciationEVM, FixedAssetDepreciationDTO> {
+public interface FixedAssetNetBookValueEVMMapping extends Mapping<FixedAssetNetBookValueEVM, FixedAssetNetBookValueDTO> {
 
-    @org.mapstruct.Mapping(target = "depreciationDate", source = "depreciationDate")
+    @org.mapstruct.Mapping(target = "netBookValueDate", source = "netBookValueDate")
     default LocalDate dateStringToLocalDate(String dateString) {
         return MapUtils.dateStringToLocalDate(dateString);
     }
 
-    @org.mapstruct.Mapping(target = "depreciationDate", source = "depreciationDate")
+    @org.mapstruct.Mapping(target = "netBookValueDate", source = "netBookValueDate")
     default String localDateToDateString(LocalDate localDateValue) {
         return MapUtils.localDateToDateString(localDateValue);
     }
 
-    @org.mapstruct.Mapping(target = "depreciationAmount", source = "depreciationAmount")
+    @org.mapstruct.Mapping(target = "netBookValue", source = "netBookValue")
     default BigDecimal toBigDecimalValue(Double doubleValue) {
         return MapUtils.doubleToBigDecimal(doubleValue);
     }
 
-    @org.mapstruct.Mapping(target = "depreciationAmount", source = "depreciationAmount")
+    @org.mapstruct.Mapping(target = "netBookValue", source = "netBookValue")
     default Double toDoubleValue(BigDecimal bigDecimalValue) {
         return MapUtils.bigDecimalToDouble(bigDecimalValue);
     }
