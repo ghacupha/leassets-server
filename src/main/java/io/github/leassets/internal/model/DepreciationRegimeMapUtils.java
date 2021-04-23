@@ -24,13 +24,11 @@ public class DepreciationRegimeMapUtils {
 
     static DepreciationRegime depreciationRegime(String stringDesignation) {
 
-        switch (stringDesignation) {
-            case "straight line basis":
-                return DepreciationRegime.STRAIGHT_LINE_BASIS;
-            case "declining balance basis":
-                return DepreciationRegime.DECLINING_BALANCE_BASIS;
-            default: throw new IllegalArgumentException("String designation: " + stringDesignation + "does not correspond to known depreciation methods");
-        }
+        if (stringDesignation.equalsIgnoreCase("straight line basis"))
+            return DepreciationRegime.STRAIGHT_LINE_BASIS;
+        if (stringDesignation.equalsIgnoreCase("declining balance basis"))
+            return DepreciationRegime.DECLINING_BALANCE_BASIS;
+        return null;
     }
 
     static String depreciationRegime(DepreciationRegime depreciationRegime) {

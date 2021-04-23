@@ -28,7 +28,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 // todo loop for every file model type
-import static io.github.leassets.domain.enumeration.LeassetsFileModelType.*;
+import static io.github.leassets.domain.enumeration.LeassetsFileModelType.CURRENCY_LIST;
+import static io.github.leassets.domain.enumeration.LeassetsFileModelType.FIXED_ASSET_ACQUISITION;
+import static io.github.leassets.domain.enumeration.LeassetsFileModelType.FIXED_ASSET_DEPRECIATION;
+import static io.github.leassets.domain.enumeration.LeassetsFileModelType.FIXED_ASSET_NBV;
 
 
 /**
@@ -61,15 +64,23 @@ public class FileUploadProcessorContainer {
     @Qualifier("fixedAssetDepreciationListDeletionJob")
     private Job fixedAssetDepreciationListDeletionJob;
 
+    @Autowired
+    @Qualifier("fixedAssetNetBookValueListPersistenceJob")
+    private Job fixedAssetNetBookValueListPersistenceJob;
+
+    @Autowired
+    @Qualifier("fixedAssetNetBookValueListDeletionJob")
+    private Job fixedAssetNetBookValueListDeletionJob;
+
     @Bean("fileUploadProcessorChain")
     public FileUploadProcessorChain fileUploadProcessorChain() {
 
         FileUploadProcessorChain theChain = new FileUploadProcessorChain();
 
         // Create the chain, each should match against it's specific key of data-model type
-        theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, currencyTablePersistenceJob, CURRENCY_LIST));
         theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetAcquisitionListPersistenceJob, FIXED_ASSET_ACQUISITION));
         theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetDepreciationListPersistenceJob, FIXED_ASSET_DEPRECIATION));
+        theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetNetBookValueListPersistenceJob, FIXED_ASSET_NBV));
         return theChain;
     }
 
@@ -80,6 +91,7 @@ public class FileUploadProcessorContainer {
 
         theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetAcquisitionListDeletionJob, FIXED_ASSET_ACQUISITION));
         theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetDepreciationListDeletionJob, FIXED_ASSET_DEPRECIATION));
+        theChain.addProcessor(new BatchSupportedFileUploadProcessor(jobLauncher, fixedAssetNetBookValueListDeletionJob, FIXED_ASSET_NBV));
 
         return theChain;
     }

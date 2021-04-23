@@ -20,16 +20,20 @@ package io.github.leassets.internal.model;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelRow;
+import io.github.leassets.internal.framework.ExcelViewModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.SerializationUtils;
+
+import java.io.Serializable;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FixedAssetNetBookValueEVM {
+public class FixedAssetNetBookValueEVM implements Serializable, ExcelViewModel<FixedAssetNetBookValueEVM> {
 
     @ExcelRow
     private Long rowIndex;
@@ -61,4 +65,9 @@ public class FixedAssetNetBookValueEVM {
     private String fileUploadToken;
 
     private String compilationToken;
+
+    @Override
+    public FixedAssetNetBookValueEVM getModelData() {
+        return SerializationUtils.clone(this);
+    }
 }

@@ -19,7 +19,6 @@ package io.github.leassets.internal.batch;
  */
 
 import io.github.leassets.internal.framework.batch.DeletionJobListener;
-import io.github.leassets.internal.framework.batch.HasIndex;
 import io.github.leassets.internal.framework.service.FileUploadDeletionService;
 import io.github.leassets.service.dto.LeassetsFileUploadDTO;
 import org.springframework.batch.core.JobExecutionListener;

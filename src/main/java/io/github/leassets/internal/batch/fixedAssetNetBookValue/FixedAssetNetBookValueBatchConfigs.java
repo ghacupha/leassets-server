@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package io.github.leassets.internal.batch.fixedAssetDepreciation;
+package io.github.leassets.internal.batch.fixedAssetNetBookValue;
 
 import com.google.common.collect.ImmutableList;
-import io.github.leassets.domain.FixedAssetDepreciation;
+import io.github.leassets.domain.FixedAssetNetBookValue;
 import io.github.leassets.internal.framework.BatchService;
 import io.github.leassets.internal.framework.FileUploadsProperties;
 import io.github.leassets.internal.framework.Mapping;
@@ -34,8 +34,8 @@ import io.github.leassets.internal.framework.batch.ReadFileStep;
 import io.github.leassets.internal.framework.batch.SingleStepEntityJob;
 import io.github.leassets.internal.framework.excel.ExcelFileDeserializer;
 import io.github.leassets.internal.framework.service.DeletionUploadService;
-import io.github.leassets.internal.model.FixedAssetDepreciationEVM;
-import io.github.leassets.service.dto.FixedAssetDepreciationDTO;
+import io.github.leassets.internal.model.FixedAssetNetBookValueEVM;
+import io.github.leassets.service.dto.FixedAssetNetBookValueDTO;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -54,18 +54,18 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class FixedAssetDepreciationBatchConfigs {
+public class FixedAssetNetBookValueBatchConfigs {
 
-    private static final String PERSISTENCE_JOB_NAME = "fixedAssetDepreciationListPersistenceJob";
-    private static final String DELETION_JOB_NAME = "fixedAssetDepreciationListDeletionJob";
-    private static final String READ_FILE_STEP_NAME = "readFixedAssetDepreciationListFromFile";
-    private static final String DELETION_STEP_NAME = "deleteFixedAssetDepreciationListFromFile";
-    private static final String DELETION_PROCESSOR_NAME = "fixedAssetDepreciationDeletionProcessor";
-    private static final String DELETION_WRITER_NAME = "fixedAssetDepreciationDeletionWriter";
-    private static final String DELETION_READER_NAME = "fixedAssetsDepreciationDeletionReader";
-    private static final String PERSISTENCE_READER_NAME = "fixedAssetDepreciationListItemReader";
-    private static final String PERSISTENCE_PROCESSOR_NAME = "fixedAssetsDepreciationListItemProcessor";
-    private static final String PERSISTENCE_WRITER_NAME = "fixedAssetDepreciationEntityListItemsWriter";
+    private static final String PERSISTENCE_JOB_NAME = "fixedAssetNetBookValueListPersistenceJob";
+    private static final String DELETION_JOB_NAME = "fixedAssetNetBookValueListDeletionJob";
+    private static final String READ_FILE_STEP_NAME = "readFixedAssetNetBookValueListFromFile";
+    private static final String DELETION_STEP_NAME = "deleteFixedAssetNetBookValueListFromFile";
+    private static final String DELETION_PROCESSOR_NAME = "fixedAssetNetBookValueDeletionProcessor";
+    private static final String DELETION_WRITER_NAME = "fixedAssetNetBookValueDeletionWriter";
+    private static final String DELETION_READER_NAME = "fixedAssetsNetBookValueDeletionReader";
+    private static final String PERSISTENCE_READER_NAME = "fixedAssetNetBookValueListItemReader";
+    private static final String PERSISTENCE_PROCESSOR_NAME = "fixedAssetsNetBookValueListItemProcessor";
+    private static final String PERSISTENCE_WRITER_NAME = "fixedAssetNetBookValueEntityListItemsWriter";
 
     @SuppressWarnings("SpringElStaticFieldInjectionInspection")
     @Value("#{jobParameters['fileId']}")
@@ -87,16 +87,16 @@ public class FixedAssetDepreciationBatchConfigs {
     private JobExecutionListener deletionJobListener;
 
     @Autowired
-    private ExcelFileDeserializer<FixedAssetDepreciationEVM> fixedAssetDepreciationDeserializer;
+    private ExcelFileDeserializer<FixedAssetNetBookValueEVM> fixedAssetNetBookValueDeserializer;
 
     @Autowired
-    private BatchService<FixedAssetDepreciationDTO> batchService;
+    private BatchService<FixedAssetNetBookValueDTO> batchService;
 
     @Autowired
-    private DeletionService<FixedAssetDepreciation> fixedAssetDepreciationDeletionService;
+    private DeletionService<FixedAssetNetBookValue> fixedAssetNetBookValueDeletionService;
 
     @Autowired
-    private Mapping<FixedAssetDepreciationEVM, FixedAssetDepreciationDTO> mapping;
+    private Mapping<FixedAssetNetBookValueEVM, FixedAssetNetBookValueDTO> mapping;
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -108,19 +108,19 @@ public class FixedAssetDepreciationBatchConfigs {
     private BatchPersistentFileUploadService fileUploadService;
 
     @Autowired
-    private DeletionUploadService<FixedAssetDepreciationDTO> fileUploadDeletionService;
+    private DeletionUploadService<FixedAssetNetBookValueDTO> fileUploadDeletionService;
 
     @Bean(PERSISTENCE_READER_NAME)
     @JobScope
-    public EntityItemsReader<FixedAssetDepreciationEVM> listItemReader(
+    public EntityItemsReader<FixedAssetNetBookValueEVM> listItemReader(
         @Value("#{jobParameters['fileId']}") long fileId
     ) {
-        return new EntityItemsReader<>(fixedAssetDepreciationDeserializer, fileUploadService, fileId, fileUploadsProperties);
+        return new EntityItemsReader<>(fixedAssetNetBookValueDeserializer, fileUploadService, fileId, fileUploadsProperties);
     }
 
     @Bean(PERSISTENCE_PROCESSOR_NAME)
     @JobScope
-    public ItemProcessor<List<FixedAssetDepreciationEVM>, List<FixedAssetDepreciationDTO>> listItemsProcessor(
+    public ItemProcessor<List<FixedAssetNetBookValueEVM>, List<FixedAssetNetBookValueDTO>> listItemsProcessor(
         @Value("#{jobParameters['messageToken']}") String jobUploadToken
     ) {
         return evms ->
@@ -129,7 +129,7 @@ public class FixedAssetDepreciationBatchConfigs {
 
     @Bean(PERSISTENCE_WRITER_NAME)
     @JobScope
-    public EntityListItemsWriter<FixedAssetDepreciationDTO> listItemsWriter() {
+    public EntityListItemsWriter<FixedAssetNetBookValueDTO> listItemsWriter() {
         return new EntityListItemsWriter<>(batchService);
     }
 
@@ -149,13 +149,13 @@ public class FixedAssetDepreciationBatchConfigs {
         return new SingleStepEntityJob(PERSISTENCE_JOB_NAME, persistenceJobListener, readFile(), jobBuilderFactory);
     }
 
-    // fixedAssetDepreciationDeletionJob
+    // fixedAssetNetBookValueDeletionJob
     @Bean(DELETION_JOB_NAME)
-    public Job fixedAssetDepreciationDeletionJob() {
+    public Job fixedAssetNetBookValueDeletionJob() {
         return new SingleStepEntityJob(DELETION_JOB_NAME, deletionJobListener, deleteEntityListFromFile(), jobBuilderFactory);
     }
 
-    // deleteFixedAssetDepreciationListFromFile step
+    // deleteFixedAssetNetBookValueListFromFile step
     @Bean(DELETION_STEP_NAME)
     public Step deleteEntityListFromFile() {
         return new DataDeletionStep<>(
@@ -176,12 +176,12 @@ public class FixedAssetDepreciationBatchConfigs {
     }
 
     @Bean(DELETION_PROCESSOR_NAME)
-    public ItemProcessor<List<Long>, List<FixedAssetDepreciation>> deletionProcessor() {
-        return new EntityDeletionProcessor<>(fixedAssetDepreciationDeletionService);
+    public ItemProcessor<List<Long>, List<FixedAssetNetBookValue>> deletionProcessor() {
+        return new EntityDeletionProcessor<>(fixedAssetNetBookValueDeletionService);
     }
 
     @Bean(DELETION_WRITER_NAME)
-    public ItemWriter<? super List<FixedAssetDepreciation>> deletionWriter() {
+    public ItemWriter<? super List<FixedAssetNetBookValue>> deletionWriter() {
         return deletables -> {};
     }
 }
