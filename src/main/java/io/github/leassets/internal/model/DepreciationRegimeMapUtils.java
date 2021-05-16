@@ -22,11 +22,14 @@ import io.github.leassets.domain.enumeration.DepreciationRegime;
 
 public class DepreciationRegimeMapUtils {
 
+    private static final String STRAIGHT_LINE_BASIS_STRING = "straight line basis";
+    private static final String DECLINING_BALANCE_BASIS_STRING = "declining balance basis";
+
     static DepreciationRegime depreciationRegime(String stringDesignation) {
 
-        if (stringDesignation.equalsIgnoreCase("straight line basis"))
+        if (stringDesignation.equalsIgnoreCase(STRAIGHT_LINE_BASIS_STRING))
             return DepreciationRegime.STRAIGHT_LINE_BASIS;
-        if (stringDesignation.equalsIgnoreCase("declining balance basis"))
+        if (stringDesignation.equalsIgnoreCase(DECLINING_BALANCE_BASIS_STRING))
             return DepreciationRegime.DECLINING_BALANCE_BASIS;
         return null;
     }
@@ -35,9 +38,9 @@ public class DepreciationRegimeMapUtils {
 
         switch (depreciationRegime) {
             case STRAIGHT_LINE_BASIS:
-                return "straight line basis";
+                return STRAIGHT_LINE_BASIS_STRING;
             case DECLINING_BALANCE_BASIS:
-                return "declining balance basis";
+                return DECLINING_BALANCE_BASIS_STRING;
             default: throw new IllegalArgumentException("You want to review your depreciation regime, just one more time!");
         }
     }
